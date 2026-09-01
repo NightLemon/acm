@@ -1,0 +1,1013 @@
+{
+  "days": [
+    {
+      "day": 1,
+      "title": "二分与旋转数组：把边界写死",
+      "focus": "固定一套二分模板——闭区间/半开区间只选一种并写到手滑，并掌握旋转数组这类「局部有序」的判断方法。",
+      "drill": "不查资料写出三个模板：lower_bound、upper_bound、以及「二分答案 check(mid)」骨架；C++ 和 Python 各写一遍，写完用 [1,1,2,2,3] 手工跑一遍验证返回下标。",
+      "problems": [
+        {
+          "id": "33",
+          "title": "Search in Rotated Sorted Array",
+          "cn": "搜索旋转排序数组",
+          "tier": "core",
+          "est": 25,
+          "idea": "每次用 nums[l] 与 nums[mid] 比较判断哪半边有序，再看 target 是否落在那个有序区间内决定收缩方向。",
+          "pitfall": "判断有序半边时必须用 nums[l] <= nums[mid]（带等号），否则 l==mid 的两元素情形会走错分支；区间判定要用闭/开一致的 <= 与 <，混用会漏掉端点。",
+          "variants": [
+            "用 153 先找旋转点再普通二分",
+            "改成返回任意一个等值下标"
+          ]
+        },
+        {
+          "id": "81",
+          "title": "Search in Rotated Sorted Array II",
+          "cn": "搜索旋转排序数组 II",
+          "tier": "core",
+          "est": 25,
+          "idea": "在 33 的基础上多一个分支：当 nums[l]==nums[mid]==nums[r] 时无法判断，只能 l++ 退化线性。",
+          "pitfall": "很多人只写 nums[l]==nums[mid] 就 l++，在 [1,0,1,1,1] 上会错；必须三者相等才收缩，且要先判 nums[mid]==target 再收缩，否则可能把答案缩掉。",
+          "variants": [
+            "证明最坏 O(n)",
+            "对比 154 求最小值版本"
+          ]
+        },
+        {
+          "id": "4",
+          "title": "Median of Two Sorted Arrays",
+          "cn": "两个有序数组的中位数",
+          "tier": "core",
+          "est": 45,
+          "idea": "对短数组二分「左半部分取多少个」，用 max(左) <= min(右) 作为割点合法条件。",
+          "pitfall": "必须保证在短数组上二分否则 j 会越界为负；四个哨兵 ±INF 一定要写；奇偶总长的答案取法不同（奇数只取 max 左），漏掉 +1 的 (m+n+1)/2 会让偶数情况整体错位。",
+          "variants": [
+            "写第 k 小的递归删除法对比",
+            "扩展成 K 个数组的中位数思路"
+          ]
+        },
+        {
+          "id": "42",
+          "title": "Trapping Rain Water",
+          "cn": "接雨水",
+          "tier": "core",
+          "est": 25,
+          "idea": "双指针从两端往里走，谁的一侧最大值小就结算谁——因为那一侧的答案已被另一侧兜底。",
+          "pitfall": "结算时要用「已更新后的 leftMax/rightMax 减当前高度」，先更新再累加，顺序反了会出负数；相等时随便动一边但要保证有推进，否则死循环。",
+          "variants": [
+            "用单调栈按层结算重写",
+            "写 dp 预处理前后缀最大值版本"
+          ]
+        },
+        {
+          "id": "76",
+          "title": "Minimum Window Substring",
+          "cn": "最小覆盖子串",
+          "tier": "core",
+          "est": 35,
+          "idea": "用 need 计数表加一个 valid 计数器（只有某字符计数从不足到刚好满足时 valid++），右扩左缩。",
+          "pitfall": "valid 的加减条件必须是「相等的那一刻」才动，写成 >= 会重复计数；缩窗时先记录答案再移动 left，顺序反了长度会差一；不在 need 里的字符不能进 window 计数。",
+          "variants": [
+            "用固定 26/128 数组替代 hashmap 提速",
+            "改写成返回所有最小窗口"
+          ]
+        },
+        {
+          "id": "239",
+          "title": "Sliding Window Maximum",
+          "cn": "滑动窗口最大值",
+          "tier": "core",
+          "est": 20,
+          "idea": "单调递减双端队列存下标，队头过期就弹出，新元素把队尾比它小的全弹掉。",
+          "pitfall": "队列存下标而不是值，否则无法判断过期；出队条件是 dq.front() <= i-k（用下标算），写成 < 会少弹一个；答案要等 i>=k-1 才开始记录。",
+          "variants": [
+            "用两个栈模拟单调队列",
+            "改成滑动窗口最小值"
+          ]
+        },
+        {
+          "id": "410",
+          "title": "Split Array Largest Sum",
+          "cn": "分割数组的最大值",
+          "tier": "core",
+          "est": 25,
+          "idea": "二分答案：猜一个上限 x，贪心从左到右尽量塞，统计需要几段，段数 <= m 说明 x 可行。",
+          "pitfall": "二分下界必须是 max(nums) 而不是 0，否则 check 永远失败甚至死循环；check 里累加要用 long long 防溢出；贪心分段时「当前段加不下就新开一段并把当前数放进新段」，别忘了最后一段也要计数。",
+          "variants": [
+            "写区间 DP O(n^2 m) 版本对比",
+            "换成 1011 送包裹练同一模板"
+          ]
+        },
+        {
+          "id": "719",
+          "title": "Find K-th Smallest Pair Distance",
+          "cn": "找出第 K 小的数对距离",
+          "tier": "core",
+          "est": 30,
+          "idea": "先排序，再对「距离」二分答案，check 用双指针统计距离 <= mid 的数对个数。",
+          "pitfall": "统计时双指针的 left 不能重置（整体单调），重置会退化 O(n^2) 超时；计数是 i-left 而不是 i-left+1；k 是第 k 小（1-indexed），二分要取满足 count>=k 的最小值。",
+          "variants": [
+            "对比 373 用堆的做法",
+            "改成第 k 大距离"
+          ]
+        },
+        {
+          "id": "153",
+          "title": "Find Minimum in Rotated Sorted Array",
+          "cn": "寻找旋转排序数组中的最小值",
+          "tier": "optional",
+          "est": 12,
+          "idea": "与 nums[r] 比较（不是 nums[l]），nums[mid] > nums[r] 说明最小值在右半。",
+          "pitfall": "必须跟右端点比。跟左端点比在没旋转的数组上会判错；收缩时 r = mid（不能 mid-1，mid 自己可能就是答案），l = mid+1。",
+          "variants": [
+            "改成 154 带重复元素"
+          ]
+        },
+        {
+          "id": "162",
+          "title": "Find Peak Element",
+          "cn": "寻找峰值",
+          "tier": "optional",
+          "est": 12,
+          "idea": "比较 nums[mid] 与 nums[mid+1]，往上坡方向走必然能撞到峰。",
+          "pitfall": "循环条件用 l < r 且不判等，用 l <= r 加 mid+1 会越界；不需要处理 nums[mid-1]，多写反而引入边界 bug。",
+          "variants": []
+        },
+        {
+          "id": "875",
+          "title": "Koko Eating Bananas",
+          "cn": "爱吃香蕉的珂珂",
+          "tier": "optional",
+          "est": 15,
+          "idea": "最纯粹的二分答案模板题，check 是 sum(ceil(p/k)) <= h。",
+          "pitfall": "上取整写成 (p+k-1)/k，用浮点 ceil 在大数下会精度出错；速度下界是 1 不是 0。",
+          "variants": [
+            "换成 1011、2064 同模板重刷"
+          ]
+        },
+        {
+          "id": "11",
+          "title": "Container With Most Water",
+          "cn": "盛最多水的容器",
+          "tier": "optional",
+          "est": 12,
+          "idea": "双指针从两端收缩，每次移动较矮的那一边。",
+          "pitfall": "面积用 min(h[l],h[r]) * (r-l)，宽度别写成 r-l+1；相等时动哪边都行但必须动一边。",
+          "variants": [
+            "写贪心正确性的一句话证明"
+          ]
+        },
+        {
+          "id": "15",
+          "title": "3Sum",
+          "cn": "三数之和",
+          "tier": "optional",
+          "est": 20,
+          "idea": "排序后固定第一个数，内层双指针，靠跳过相同值去重。",
+          "pitfall": "三处去重位置不同：外层 i>0 && nums[i]==nums[i-1] 跳过；找到答案后 l 和 r 都要跳重复，只跳一个会出重复解。",
+          "variants": [
+            "扩展成 18 四数之和",
+            "改成用哈希的 O(n^2) 写法"
+          ]
+        },
+        {
+          "id": "992",
+          "title": "Subarrays with K Different Integers",
+          "cn": "K 个不同整数的子数组",
+          "tier": "optional",
+          "est": 25,
+          "idea": "恰好 K 个 = 至多 K 个 - 至多 K-1 个，把「恰好」转成两次标准滑窗。",
+          "pitfall": "直接写「恰好 K」的滑窗几乎必错，因为窗口不单调；atMost 里累加的是 r-l+1（以 r 结尾的合法子数组个数），写成 1 会漏。",
+          "variants": [
+            "用同套路解 930、1248"
+          ]
+        },
+        {
+          "id": "209",
+          "title": "Minimum Size Subarray Sum",
+          "cn": "长度最小的子数组",
+          "tier": "optional",
+          "est": 12,
+          "idea": "正数前提下窗口和单调，右扩左缩取最短。",
+          "pitfall": "答案初值设 INT_MAX，最后没找到要返回 0；缩窗用 while 不是 if。",
+          "variants": [
+            "改成含负数版本 862（需单调队列+前缀和）"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 2,
+      "title": "滑窗与双指针：一次遍历的纪律",
+      "focus": "训练「窗口不变量」的表达能力——每道题先写清楚窗口内维持什么性质，再让代码只在破坏性质时收缩。同时练前缀和与二分答案的混合套路。",
+      "drill": "不查资料写出一个通用滑窗骨架（右扩 → while(不合法) 左缩 → 更新答案），并把它套到 3、424、438 三题上，每题只改 3 行；同时写出 Python 的 collections.Counter / deque 常用 API 和 C++ 的 unordered_map 计数写法。",
+      "problems": [
+        {
+          "id": "3",
+          "title": "Longest Substring Without Repeating Characters",
+          "cn": "无重复字符的最长子串",
+          "tier": "core",
+          "est": 12,
+          "idea": "哈希记录字符上次出现位置，left = max(left, last[c]+1)。",
+          "pitfall": "left 必须取 max，否则遇到 \"abba\" 时 left 会往回跳导致答案偏大；答案长度是 r-l+1。",
+          "variants": [
+            "改成用计数表 while 收缩的写法"
+          ]
+        },
+        {
+          "id": "424",
+          "title": "Longest Repeating Character Replacement",
+          "cn": "替换后的最长重复字符",
+          "tier": "core",
+          "est": 18,
+          "idea": "窗口合法条件是 (窗口长度 - 窗口内最多字符出现次数) <= k。",
+          "pitfall": "maxCount 不需要（也不应该）在收缩时回退——它只增不减仍能给出正确答案，但如果你写 if 而非 while 收缩，必须理解窗口长度只增不减这个前提，否则改成 while 又忘了更新 maxCount 会错。",
+          "variants": [
+            "写严格版：每次重算 maxCount 对比性能"
+          ]
+        },
+        {
+          "id": "438",
+          "title": "Find All Anagrams in a String",
+          "cn": "找到字符串中所有字母异位词",
+          "tier": "core",
+          "est": 15,
+          "idea": "定长窗口 + 26 长度计数数组，逐位滑动比较。",
+          "pitfall": "每步只增删一个字符再比较，别每步都 O(26) 重建数组（可以，但更好的是维护 diff 计数）；p 比 s 长时要直接返回空。",
+          "variants": [
+            "改成维护 matched 计数达到 O(n)",
+            "扩展成 567 排列判定"
+          ]
+        },
+        {
+          "id": "862",
+          "title": "Shortest Subarray with Sum at Least K",
+          "cn": "和至少为 K 的最短子数组",
+          "tier": "core",
+          "est": 35,
+          "idea": "前缀和 + 单调递增双端队列：队头满足 pre[i]-pre[dq.front()] >= K 就结算并弹出，队尾比 pre[i] 大的全弹掉。",
+          "pitfall": "因为有负数，普通滑窗完全失效；队尾弹出条件是 pre[dq.back()] >= pre[i]（带等号），漏掉会留下无用状态；前缀和数组长度是 n+1，下标别错位。",
+          "variants": [
+            "对比 209 正数版为何能用滑窗"
+          ]
+        },
+        {
+          "id": "1004",
+          "title": "Max Consecutive Ones III",
+          "cn": "最大连续 1 的个数 III",
+          "tier": "optional",
+          "est": 12,
+          "idea": "窗口内 0 的个数不超过 k。",
+          "pitfall": "这题用 if 代替 while 收缩也能过（窗口只增不减），但要清楚这是「求最长」特有的技巧，换成求最短就崩。",
+          "variants": [
+            "改成求最短满足条件的窗口体会差异"
+          ]
+        },
+        {
+          "id": "713",
+          "title": "Subarray Product Less Than K",
+          "cn": "乘积小于 K 的子数组",
+          "tier": "optional",
+          "est": 15,
+          "idea": "滑窗，每个右端点贡献 r-l+1 个子数组。",
+          "pitfall": "k<=1 要直接返回 0，否则 left 会越过 right 死循环；乘积用 long long 或先除后比。",
+          "variants": [
+            "改成用取对数+前缀和+二分"
+          ]
+        },
+        {
+          "id": "1248",
+          "title": "Count Number of Nice Subarrays",
+          "cn": "统计优美子数组",
+          "tier": "optional",
+          "est": 18,
+          "idea": "奇数记 1 偶数记 0，转化为「和恰好为 k 的子数组个数」，用前缀和哈希或至多法。",
+          "pitfall": "哈希表要先放 {0:1} 初始项，漏了会少算从下标 0 开始的子数组。",
+          "variants": [
+            "用 atMost(k)-atMost(k-1) 重写"
+          ]
+        },
+        {
+          "id": "567",
+          "title": "Permutation in String",
+          "cn": "字符串的排列",
+          "tier": "optional",
+          "est": 12,
+          "idea": "定长滑窗计数比较，与 438 同模板。",
+          "pitfall": "注意是判断存在性，找到就可以直接 return true，别写成统计全部。",
+          "variants": []
+        },
+        {
+          "id": "1358",
+          "title": "Number of Substrings Containing All Three Characters",
+          "cn": "包含所有三种字符的子字符串数目",
+          "tier": "optional",
+          "est": 15,
+          "idea": "对每个右端点，找到最大的左端点使窗口仍含 abc，贡献 left+1 个。",
+          "pitfall": "贡献是 left+1（left 是收缩后第一个不合法位置的下标），差一就整体错。",
+          "variants": [
+            "改用记录三个字符最后出现位置的 O(1) 空间做法"
+          ]
+        },
+        {
+          "id": "1477",
+          "title": "Find Two Non-overlapping Sub-arrays Each With Target Sum",
+          "cn": "找两个和为目标值且不重叠的子数组",
+          "tier": "optional",
+          "est": 25,
+          "idea": "滑窗求出以每个位置结尾/开头的最短合法子数组，再用前缀最小值拼接。",
+          "pitfall": "best[i] 必须是「前 i 个位置内的最短」而非「恰好以 i 结尾」，忘记做前缀 min 传递会漏解；两段不重叠的分界要用 i 和 i+1 明确切开。",
+          "variants": []
+        },
+        {
+          "id": "31",
+          "title": "Next Permutation",
+          "cn": "下一个排列",
+          "tier": "optional",
+          "est": 15,
+          "idea": "从右找第一个 nums[i]<nums[i+1]，再从右找第一个大于它的交换，最后翻转后缀。",
+          "pitfall": "找不到 i（整个降序）时要整体翻转而不是返回；第二步找的是「从右往左第一个大于 nums[i] 的」，写成从左找会错。",
+          "variants": [
+            "写 prev_permutation 版本"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 3,
+      "title": "单调栈：把「下一个更大」写成条件反射",
+      "focus": "理清单调栈的三个要点——栈里存什么（下标）、什么时候弹（严格还是非严格）、弹的时候结算什么。这天所有题都是同一个骨架的变形。",
+      "drill": "写出单调栈骨架并明确注释「栈内单调性方向 + 弹栈时结算的含义」；然后用同一份骨架在 15 分钟内连写 739、503、901 三题，全程不查资料。",
+      "problems": [
+        {
+          "id": "84",
+          "title": "Largest Rectangle in Histogram",
+          "cn": "柱状图中最大的矩形",
+          "tier": "core",
+          "est": 30,
+          "idea": "单调递增栈，弹栈时当前元素是右边界、栈中下一个元素是左边界，宽度 = r-l-1。",
+          "pitfall": "宽度必须是 i - st.top() - 1（弹出后的新栈顶），而不是 i - 弹出下标；栈空时宽度是 i；末尾要补一个高度 0 的哨兵强制清栈，否则残留柱子不结算。",
+          "variants": [
+            "用左右第一个更小元素预处理数组重写",
+            "加左哨兵 -1 简化栈空判断"
+          ]
+        },
+        {
+          "id": "85",
+          "title": "Maximal Rectangle",
+          "cn": "最大矩形",
+          "tier": "core",
+          "est": 30,
+          "idea": "逐行把矩阵压成直方图高度数组，每行调用一次 84。",
+          "pitfall": "高度更新是「当前格为 '1' 则 h+1，否则清零」，忘记清零会把断开的列连起来；矩阵元素是字符 '1' 不是数字 1。",
+          "variants": [
+            "改用左右边界 DP 的 O(nm) 写法"
+          ]
+        },
+        {
+          "id": "316",
+          "title": "Remove Duplicate Letters",
+          "cn": "去除重复字母",
+          "tier": "core",
+          "est": 30,
+          "idea": "贪心 + 单调栈：栈顶字符大于当前且后面还会出现，就弹掉；已在栈中的字符直接跳过。",
+          "pitfall": "必须同时维护「剩余计数」和「是否在栈中」两个数组，只用其中一个必错；弹栈时要把 inStack 置回 false，忘记会导致字符永久丢失。",
+          "variants": [
+            "对比 1081 相同题",
+            "换成 402 移掉 K 位数字"
+          ]
+        },
+        {
+          "id": "895",
+          "title": "Maximum Frequency Stack",
+          "cn": "最大频率栈",
+          "tier": "core",
+          "est": 25,
+          "idea": "按频率分组：group[f] 存所有出现次数达到过 f 的元素栈，push 时把 x 压进 group[cnt[x]]，pop 时从 maxFreq 组弹出。",
+          "pitfall": "pop 后如果 group[maxFreq] 空了要把 maxFreq 减一（而不是重新扫描）；同一元素会同时存在于 group[1..cnt[x]] 多个层里，这正是保证「同频取最近」的关键，别去重。",
+          "variants": [
+            "用 (freq, seq) 的堆实现对比"
+          ]
+        },
+        {
+          "id": "739",
+          "title": "Daily Temperatures",
+          "cn": "每日温度",
+          "tier": "optional",
+          "est": 12,
+          "idea": "单调递减栈存下标，弹栈时答案就是下标差。",
+          "pitfall": "栈存下标不存温度；弹栈条件用严格大于，相等时不弹（题目要求严格更高）。",
+          "variants": [
+            "改成从右往左的写法"
+          ]
+        },
+        {
+          "id": "503",
+          "title": "Next Greater Element II",
+          "cn": "下一个更大元素 II",
+          "tier": "optional",
+          "est": 12,
+          "idea": "数组下标取模走两圈模拟循环。",
+          "pitfall": "第二圈只能弹栈不能入栈（或者入了也无所谓但要保证不覆盖答案）；答案数组初始化为 -1。",
+          "variants": []
+        },
+        {
+          "id": "901",
+          "title": "Online Stock Span",
+          "cn": "股票价格跨度",
+          "tier": "optional",
+          "est": 12,
+          "idea": "栈里存 (价格, 跨度) 对，弹栈时把跨度累加过来。",
+          "pitfall": "弹栈条件是 <=（价格相等也要合并），写成 < 会算少。",
+          "variants": []
+        },
+        {
+          "id": "907",
+          "title": "Sum of Subarray Minimums",
+          "cn": "子数组的最小值之和",
+          "tier": "optional",
+          "est": 25,
+          "idea": "对每个元素算它作为最小值的左右扩展边界，贡献 = a[i]*left*right。",
+          "pitfall": "为避免相同元素重复计数，左边界用严格小于、右边界用小于等于（一边严格一边非严格），两边都严格会漏算重复值的情形；结果要对 1e9+7 取模且中途用 long long。",
+          "variants": [
+            "写子数组最大值之和",
+            "扩展成 2104 子数组范围和"
+          ]
+        },
+        {
+          "id": "402",
+          "title": "Remove K Digits",
+          "cn": "移掉 K 位数字",
+          "tier": "optional",
+          "est": 15,
+          "idea": "单调不减栈，栈顶比当前大就弹并 k--。",
+          "pitfall": "遍历完 k 还有剩余要从尾部继续删；结果要去掉前导零，且全删空时返回 \"0\"。",
+          "variants": [
+            "对比 1673 最具竞争力的子序列"
+          ]
+        },
+        {
+          "id": "32",
+          "title": "Longest Valid Parentheses",
+          "cn": "最长有效括号",
+          "tier": "optional",
+          "est": 20,
+          "idea": "栈里存下标，初始压入 -1 作为「上一个不匹配位置」的基准。",
+          "pitfall": "遇到 ')' 先弹再判空：栈空说明当前 ')' 是新基准要压入 i，非空则答案是 i - st.top()；顺序写反会整体错。",
+          "variants": [
+            "写 O(1) 空间的左右两次扫描法",
+            "写 DP 版本"
+          ]
+        },
+        {
+          "id": "946",
+          "title": "Validate Stack Sequences",
+          "cn": "验证栈序列",
+          "tier": "optional",
+          "est": 12,
+          "idea": "模拟：push 一个就 while 尝试匹配 popped 指针。",
+          "pitfall": "最后判断栈是否为空而不是指针是否走完（等价但别混）；while 里要先判栈非空。",
+          "variants": []
+        },
+        {
+          "id": "155",
+          "title": "Min Stack",
+          "cn": "最小栈",
+          "tier": "optional",
+          "est": 10,
+          "idea": "辅助栈同步存当前最小值，或存差值做 O(1) 空间。",
+          "pitfall": "辅助栈 push 时相等的最小值也要压（否则 pop 后最小值丢失）；差值法要用 long long 防溢出。",
+          "variants": [
+            "写只用一个栈的差值编码版本"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 4,
+      "title": "堆与有序容器：k 路合并和动态中位数",
+      "focus": "熟悉 priority_queue / heapq / multiset 的 API，尤其是「对顶堆」和「延迟删除」两个模式——这是最常被要求现场实现的数据结构技巧。",
+      "drill": "写出四段代码：C++ 自定义比较器的 priority_queue（lambda 与 struct 两种写法）、Python heapq 存 (key, idx) 元组、对顶堆的 balance() 函数、以及带延迟删除的堆（配 unordered_map 记录待删计数）。",
+      "problems": [
+        {
+          "id": "23",
+          "title": "Merge k Sorted Lists",
+          "cn": "合并 K 个升序链表",
+          "tier": "core",
+          "est": 20,
+          "idea": "小顶堆存每条链表的当前头节点，弹一个接一个再把 next 入堆。",
+          "pitfall": "C++ 里链表指针不能直接比较，必须写比较器且注意 priority_queue 的 comparator 是「反的」（返回 true 表示优先级低）；Python 里要存 (val, idx, node) 防止 val 相等时比较 node 报错；空链表要跳过不能入堆。",
+          "variants": [
+            "写分治两两归并版本对比复杂度"
+          ]
+        },
+        {
+          "id": "295",
+          "title": "Find Median from Data Stream",
+          "cn": "数据流的中位数",
+          "tier": "core",
+          "est": 25,
+          "idea": "对顶堆：大顶堆存较小一半，小顶堆存较大一半，始终保持 size 差 <= 1。",
+          "pitfall": "插入必须先进一个堆再把堆顶转移到另一个堆（不能直接按大小判断进哪个），否则会破坏「左堆全部 <= 右堆」的不变量；取中位数时整数溢出要用 /2.0 或先转 double。",
+          "variants": [
+            "用一个 multiset + 迭代器实现",
+            "扩展成滑动窗口版 480"
+          ]
+        },
+        {
+          "id": "480",
+          "title": "Sliding Window Median",
+          "cn": "滑动窗口中位数",
+          "tier": "core",
+          "est": 40,
+          "idea": "在 295 的对顶堆上加「延迟删除」：用哈希记录待删元素，只有当它浮到堆顶时才真正弹出，同时用逻辑 size 而非堆的物理 size 做平衡。",
+          "pitfall": "平衡必须基于逻辑 size（扣掉待删数量）而不是 heap.size()；prune 要在每次取堆顶前调用；删除元素时要判断它属于哪一半以正确调整计数。C++ 用 multiset + 中位数迭代器更好写，但迭代器在 erase 前后的移动顺序极易出错。",
+          "variants": [
+            "用 multiset + 迭代器重写",
+            "用有序表/树状数组+二分重写"
+          ]
+        },
+        {
+          "id": "218",
+          "title": "The Skyline Problem",
+          "cn": "天际线问题",
+          "tier": "core",
+          "est": 45,
+          "idea": "扫描线：把每栋楼拆成左右两个事件按 x 排序，用最大堆维护当前活跃高度，堆顶变化时输出关键点。",
+          "pitfall": "排序规则是全题最大坑：同 x 时左端点按高度降序在前、右端点按高度升序在后、左端点排在右端点前，任一条写反都会在楼群相接处多输出或漏输出点；删除用延迟删除（堆顶是已过期的才弹）；结尾要输出高度 0 的点。",
+          "variants": [
+            "用 multiset 计数替代堆",
+            "改用差分+有序 map 的写法"
+          ]
+        },
+        {
+          "id": "215",
+          "title": "Kth Largest Element in an Array",
+          "cn": "数组中的第K个最大元素",
+          "tier": "optional",
+          "est": 15,
+          "idea": "快速选择（三路划分）或大小为 k 的小顶堆。",
+          "pitfall": "快速选择必须随机化 pivot，否则有序输入退化 O(n^2)；全等元素要用三路划分否则同样退化；递归只走一边不要两边都走。",
+          "variants": [
+            "写堆解法对比",
+            "写迭代版快速选择"
+          ]
+        },
+        {
+          "id": "347",
+          "title": "Top K Frequent Elements",
+          "cn": "前 K 个高频元素",
+          "tier": "optional",
+          "est": 15,
+          "idea": "计数后用桶排序按频率分桶，从高频桶往回取，可做到 O(n)。",
+          "pitfall": "桶下标范围是 1..n，桶数组要开 n+1；用堆时记得是大小 k 的小顶堆而非全量大顶堆。",
+          "variants": [
+            "写堆版本",
+            "扩展成 692 需要字典序 tie-break"
+          ]
+        },
+        {
+          "id": "373",
+          "title": "Find K Pairs with Smallest Sums",
+          "cn": "查找和最小的 K 对数字",
+          "tier": "optional",
+          "est": 20,
+          "idea": "堆里先放 (nums1[i], nums2[0])，每次弹出后只把该行的下一列入堆。",
+          "pitfall": "只入「同行下一列」就不会重复；若同时入下一行会产生重复必须额外去重；初始入堆数量限制为 min(k, n) 防爆内存。",
+          "variants": [
+            "用二分答案统计对数的做法"
+          ]
+        },
+        {
+          "id": "378",
+          "title": "Kth Smallest Element in a Sorted Matrix",
+          "cn": "有序矩阵中第 K 小的元素",
+          "tier": "optional",
+          "est": 20,
+          "idea": "对值域二分，从左下角阶梯走统计 <= mid 的个数。",
+          "pitfall": "二分的答案必须收敛到矩阵中真实存在的值——用「取满足 count>=k 的最小 mid」自然保证；阶梯统计从左下角开始，方向写反会漏。",
+          "variants": [
+            "写堆版本对比"
+          ]
+        },
+        {
+          "id": "632",
+          "title": "Smallest Range Covering Elements from K Lists",
+          "cn": "最小区间",
+          "tier": "optional",
+          "est": 25,
+          "idea": "k 路指针 + 小顶堆，堆顶是当前最小、另外维护当前最大，区间 [min,max]，每次推进最小的那路。",
+          "pitfall": "curMax 要在入堆时更新而不是每次重扫；某一路走完就必须立刻结束（否则答案不可能再覆盖全部）；更新答案的比较要严格小于以保留最左区间。",
+          "variants": [
+            "改用滑动窗口+归并打标签的做法"
+          ]
+        },
+        {
+          "id": "1642",
+          "title": "Furthest Building You Can Reach",
+          "cn": "可以到达的最远建筑",
+          "tier": "optional",
+          "est": 20,
+          "idea": "贪心 + 小顶堆：先都用梯子，梯子不够时把历史最小的那次爬升换成砖块。",
+          "pitfall": "差值 <= 0 直接跳过不入堆；砖块不够时应返回当前下标 i 而不是 i-1（注意此时还没跨过去，边界很容易差一）。",
+          "variants": []
+        },
+        {
+          "id": "1834",
+          "title": "Single-Threaded CPU",
+          "cn": "单线程 CPU",
+          "tier": "optional",
+          "est": 25,
+          "idea": "按 enqueueTime 排序后模拟，堆按 (处理时间, 原下标) 出队。",
+          "pitfall": "CPU 空闲时要把时间直接跳到下一个任务的 enqueueTime，忘记跳会死循环或时间线错乱；必须保留原始下标做输出和 tie-break。",
+          "variants": []
+        }
+      ]
+    },
+    {
+      "day": 5,
+      "title": "归并与逆序对：分治计数三连",
+      "focus": "掌握归并排序模板并能改造成计数器，同时理解树状数组/离散化这条并行路线。这类题型出现频率极高。",
+      "drill": "从零写出归并排序（不许查），然后在 merge 之前插入统计循环，改造成逆序对计数；再写出树状数组的 update/query 六行代码和「离散化三件套」(拷贝、sort、unique+lower_bound)。",
+      "problems": [
+        {
+          "id": "493",
+          "title": "Reverse Pairs",
+          "cn": "翻转对",
+          "tier": "core",
+          "est": 35,
+          "idea": "归并排序，在合并前用双指针统计满足 nums[i] > 2*nums[j] 的跨半区对数。",
+          "pitfall": "统计必须在 merge 之前单独做一遍双指针（两个指针都不回退），塞进 merge 循环里会算错；2*nums[j] 要用 long long 否则溢出；统计指针 j 不能在每个 i 都重置。",
+          "variants": [
+            "用树状数组+离散化重写",
+            "改成普通逆序对 (剑指 51)"
+          ]
+        },
+        {
+          "id": "315",
+          "title": "Count of Smaller Numbers After Self",
+          "cn": "计算右侧小于当前元素的个数",
+          "tier": "core",
+          "est": 35,
+          "idea": "从右往左遍历，把值离散化后用树状数组查询前缀和；或归并排序时带着原下标合并。",
+          "pitfall": "树状数组下标必须从 1 开始，离散化后要 +1；用归并法时必须携带原始下标数组一起交换，只排值会丢失答案归属；查询的是「严格小于」，用 query(rank-1)。",
+          "variants": [
+            "写归并版本",
+            "用平衡树/有序容器插入计数"
+          ]
+        },
+        {
+          "id": "327",
+          "title": "Count of Range Sum",
+          "cn": "区间和的个数",
+          "tier": "optional",
+          "est": 35,
+          "idea": "前缀和后归并，统计满足 lower <= pre[j]-pre[i] <= upper 的对数，用两个单调指针划出区间。",
+          "pitfall": "前缀和必须用 long long；两个指针 lo/hi 在同一趟中都单调不回退，写成二分虽正确但容易把开闭区间搞反；统计数量是 hi-lo 而非 hi-lo+1。",
+          "variants": [
+            "树状数组+离散化重写"
+          ]
+        },
+        {
+          "id": "2426",
+          "title": "Number of Pairs Satisfying Inequality",
+          "cn": "满足不等式的数对数目",
+          "tier": "core",
+          "est": 30,
+          "idea": "令 a[i]=nums1[i]-nums2[i]，条件化为 a[i]-a[j] <= diff，即求 i<j 且 a[i] <= a[j]+diff 的对数，归并或树状数组统计。",
+          "pitfall": "变形后是「顺序对」不是逆序对，方向搞反直接全错；统计时用 <= 不是 <；a 值可能为负，离散化或树状数组要平移。",
+          "variants": [
+            "用树状数组重写",
+            "对比 493 的统计方向差异"
+          ]
+        },
+        {
+          "id": "75",
+          "title": "Sort Colors",
+          "cn": "颜色分类",
+          "tier": "optional",
+          "est": 10,
+          "idea": "三路划分双指针，i 与 low/high 三指针一次扫完。",
+          "pitfall": "与 high 交换后 i 不能前进（换过来的值还没检查），与 low 交换后才能 i++；循环条件是 i <= high。",
+          "variants": [
+            "改成荷兰国旗通用版给快排用"
+          ]
+        },
+        {
+          "id": "88",
+          "title": "Merge Sorted Array",
+          "cn": "合并两个有序数组",
+          "tier": "optional",
+          "est": 8,
+          "idea": "从后往前填，避免覆盖。",
+          "pitfall": "从前往后会覆盖 nums1 未处理的元素；循环结束后只需把 nums2 剩余部分搬完，nums1 剩余的天然就位。",
+          "variants": []
+        },
+        {
+          "id": "912",
+          "title": "Sort an Array",
+          "cn": "排序数组",
+          "tier": "optional",
+          "est": 20,
+          "idea": "手写快排（随机 pivot + 三路）和归并各一遍，作为本日模板的落地检验。",
+          "pitfall": "快排在全等数组上不做三路划分会 TLE；随机化不能省。",
+          "variants": [
+            "再写一遍堆排序"
+          ]
+        },
+        {
+          "id": "354",
+          "title": "Russian Doll Envelopes",
+          "cn": "俄罗斯套娃信封问题",
+          "tier": "optional",
+          "est": 25,
+          "idea": "宽升序、宽相同时高降序排序，然后对高求最长严格上升子序列。",
+          "pitfall": "高必须降序，否则同宽的信封会互相套娃；LIS 用 lower_bound（严格上升），写成 upper_bound 就变成非严格了。",
+          "variants": [
+            "写 O(n log n) LIS 模板并复用到 300"
+          ]
+        },
+        {
+          "id": "300",
+          "title": "Longest Increasing Subsequence",
+          "cn": "最长递增子序列",
+          "tier": "optional",
+          "est": 15,
+          "idea": "维护 tails 数组，用二分找第一个 >= x 的位置替换。",
+          "pitfall": "tails 不是真实的 LIS 序列，别拿它当答案输出；严格递增用 lower_bound，非严格用 upper_bound。",
+          "variants": [
+            "写 673 统计 LIS 个数"
+          ]
+        },
+        {
+          "id": "41",
+          "title": "First Missing Positive",
+          "cn": "缺失的第一个正数",
+          "tier": "optional",
+          "est": 20,
+          "idea": "原地置换：把值 v 放到下标 v-1 上，再扫一遍找第一个错位。",
+          "pitfall": "交换用 while 而非 if（换过来的值还需继续归位）；交换前要判 nums[v-1] != v 否则相同值会无限循环；只处理 1<=v<=n 的值。",
+          "variants": [
+            "写标记负号的版本"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 6,
+      "title": "前缀和与哈希：把子数组问题变成配对问题",
+      "focus": "训练「看到子数组求和/计数就立刻想前缀和 + 哈希配对」的反射，并把余数、异或、0/1 映射等常见变形一次打通。",
+      "drill": "写出前缀和哈希模板，重点是三件事：mp 初始化 {0:1}、先查后插的顺序、以及负数取模的修正 ((x%k)+k)%k；然后用同一模板在 20 分钟内连写 560、974、523。",
+      "problems": [
+        {
+          "id": "560",
+          "title": "Subarray Sum Equals K",
+          "cn": "和为 K 的子数组",
+          "tier": "core",
+          "est": 15,
+          "idea": "前缀和哈希计数，答案累加 mp[pre-k]。",
+          "pitfall": "mp 必须初始化 {0:1}；必须先查询再把当前 pre 插入，顺序反了在 k==0 时会多算自身。",
+          "variants": [
+            "改成求最长而非计数（对比 325 思路）"
+          ]
+        },
+        {
+          "id": "523",
+          "title": "Continuous Subarray Sum",
+          "cn": "连续的子数组和",
+          "tier": "core",
+          "est": 20,
+          "idea": "存前缀和模 k 的最早出现下标，同余且间隔 >= 2 即合法。",
+          "pitfall": "存的是最早下标（不是最新），要用 if not in 才插入；长度要求至少 2，所以判断 i - mp[r] >= 2；k 可能为负或 0 要特判；C++ 负数取模需修正。",
+          "variants": [
+            "对比 974 计数版"
+          ]
+        },
+        {
+          "id": "974",
+          "title": "Subarray Sums Divisible by K",
+          "cn": "和可被 K 整除的子数组",
+          "tier": "core",
+          "est": 15,
+          "idea": "按前缀和模 k 分组，同组内任取两个即为一个合法子数组，答案是 C(cnt,2) 之和。",
+          "pitfall": "C++ 中 -1 % 5 == -1，必须写 ((s%k)+k)%k，否则同余分组全错；cnt[0] 要预置为 1。",
+          "variants": [
+            "改成一边扫一边累加 cnt 的写法"
+          ]
+        },
+        {
+          "id": "1442",
+          "title": "Count Triplets That Can Form Two Arrays of Equal XOR",
+          "cn": "形成两个异或相等数组的三元组数目",
+          "tier": "core",
+          "est": 20,
+          "idea": "条件等价于 pre[i]==pre[k+1]，此时中间 j 可任取，贡献 k-i 个。",
+          "pitfall": "关键是识破 j 与答案无关，直接暴力枚举 i,k 即 O(n^2)；异或前缀和的下标定义（pre[0]=0）要与公式 pre[i]^pre[k+1] 严格对齐，差一就全错。",
+          "variants": [
+            "写 O(n) 的哈希优化版（维护同值下标个数与下标和）"
+          ]
+        },
+        {
+          "id": "1310",
+          "title": "XOR Queries of a Subarray",
+          "cn": "子数组异或查询",
+          "tier": "core",
+          "est": 10,
+          "idea": "异或前缀和，answer = pre[r+1] ^ pre[l]。",
+          "pitfall": "异或的「逆运算」还是异或，不要写成减法；前缀数组开 n+1 且 pre[0]=0。",
+          "variants": [
+            "扩展成二维异或前缀和"
+          ]
+        },
+        {
+          "id": "525",
+          "title": "Contiguous Array",
+          "cn": "连续数组",
+          "tier": "optional",
+          "est": 15,
+          "idea": "把 0 映射为 -1，转成求和为 0 的最长子数组。",
+          "pitfall": "哈希存最早下标，且要初始化 {0:-1}，写成 {0:0} 长度会差一。",
+          "variants": [
+            "对比 560 的「计数 vs 最长」写法差异"
+          ]
+        },
+        {
+          "id": "930",
+          "title": "Binary Subarrays With Sum",
+          "cn": "和相同的二元子数组",
+          "tier": "optional",
+          "est": 15,
+          "idea": "前缀和哈希，或用 atMost(goal)-atMost(goal-1)。",
+          "pitfall": "用 atMost 时 goal=0 要处理 goal-1 为负的情况（直接返回 0）。",
+          "variants": [
+            "两种写法都写一遍"
+          ]
+        },
+        {
+          "id": "1074",
+          "title": "Number of Submatrices That Sum to Target",
+          "cn": "元素和为目标值的子矩阵数量",
+          "tier": "optional",
+          "est": 25,
+          "idea": "枚举上下两行边界，把每列区间和压成一维数组后套 560。",
+          "pitfall": "列前缀和要预处理，否则内层是 O(n^3) 会超时；每换一次行边界哈希表必须清空重建。",
+          "variants": [
+            "写二维前缀和版本"
+          ]
+        },
+        {
+          "id": "304",
+          "title": "Range Sum Query 2D - Immutable",
+          "cn": "二维区域和检索",
+          "tier": "optional",
+          "est": 12,
+          "idea": "经典二维前缀和容斥。",
+          "pitfall": "前缀数组开 (m+1)x(n+1) 避免边界判断；容斥公式四项符号写错是最常见错误，建议画图核对一次。",
+          "variants": [
+            "扩展成二维差分"
+          ]
+        },
+        {
+          "id": "238",
+          "title": "Product of Array Except Self",
+          "cn": "除自身以外数组的乘积",
+          "tier": "optional",
+          "est": 12,
+          "idea": "两遍扫描，前缀积和后缀积相乘，可复用输出数组做 O(1) 额外空间。",
+          "pitfall": "不能用总积除以自身（有 0）；第二遍要用一个滚动变量而非再开数组才算 O(1)。",
+          "variants": []
+        },
+        {
+          "id": "918",
+          "title": "Maximum Sum Circular Subarray",
+          "cn": "环形子数组的最大和",
+          "tier": "optional",
+          "est": 15,
+          "idea": "答案 = max(普通最大子数组和, 总和 - 最小子数组和)。",
+          "pitfall": "全为负数时「总和-最小」会得到 0（空数组），必须特判直接返回普通最大值。",
+          "variants": [
+            "用前缀和+单调队列的滑窗写法"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 7,
+      "title": "哈希、差分与本周复盘",
+      "focus": "补齐差分数组与哈希集合两个主题，然后做限时复盘——本周所有卡壳的题重写一遍，检验本周内容是否真正掌握。",
+      "drill": "写出差分数组模板（区间 [l,r] 加 v 写成 d[l]+=v, d[r+1]-=v，再前缀和还原），并写一个「事件排序扫描线」的通用骨架；最后限时 60 分钟从空白文件重写本周你耗时最长的两道题，不许看之前的代码。",
+      "problems": [
+        {
+          "id": "128",
+          "title": "Longest Consecutive Sequence",
+          "cn": "最长连续序列",
+          "tier": "core",
+          "est": 15,
+          "idea": "放进哈希集合，只从「x-1 不存在」的起点开始向右扩展，保证整体 O(n)。",
+          "pitfall": "漏掉「只从起点扩展」的判断会退化成 O(n^2)；重复元素要靠 set 自动去重，用数组会重复计数。",
+          "variants": [
+            "用并查集重写",
+            "写排序 O(n log n) 版本对比"
+          ]
+        },
+        {
+          "id": "1109",
+          "title": "Corporate Flight Bookings",
+          "cn": "航班预订统计",
+          "tier": "core",
+          "est": 12,
+          "idea": "最纯粹的差分数组模板题。",
+          "pitfall": "题目下标从 1 开始，差分数组要开 n+2 或统一减一，最常见的错就是 d[r] 与 d[r+1] 位置写混导致右端点少加一次。",
+          "variants": [
+            "改成二维差分"
+          ]
+        },
+        {
+          "id": "1094",
+          "title": "Car Pooling",
+          "cn": "拼车",
+          "tier": "core",
+          "est": 12,
+          "idea": "位置差分（上车 +num，下车 -num），前缀和过程中判断是否超载。",
+          "pitfall": "下车点应该在 to 处就减掉（乘客在 to 下车不占用 [to, ...]），写成 to+1 会误判超载；里程上限 1000 要开够数组。",
+          "variants": [
+            "用事件排序+堆重写"
+          ]
+        },
+        {
+          "id": "1526",
+          "title": "Minimum Number of Increments on Subarrays to Form a Target Array",
+          "cn": "形成目标数组的子数组最少增加次数",
+          "tier": "optional",
+          "est": 15,
+          "idea": "答案 = 差分数组中所有正数之和。",
+          "pitfall": "第一个元素本身也算一次差分（相当于 target[0]-0），漏掉它会整体少算。",
+          "variants": [
+            "写贪心/递归分治的等价解释"
+          ]
+        },
+        {
+          "id": "995",
+          "title": "Minimum Number of K Consecutive Bit Flips",
+          "cn": "K 连续位的最小翻转次数",
+          "tier": "optional",
+          "est": 25,
+          "idea": "贪心从左到右，遇到 0 就必须翻，用差分数组 O(1) 维护「当前位置累计被翻了几次」。",
+          "pitfall": "当剩余长度不足 k 却仍需翻转时要返回 -1，判断条件是 i + k > n；差分标记要在 i+k 处消除，忘记消除会让后面全错。",
+          "variants": [
+            "用队列记录翻转生效区间重写"
+          ]
+        },
+        {
+          "id": "2251",
+          "title": "Number of Flowers in Full Bloom",
+          "cn": "花期内花的数目",
+          "tier": "optional",
+          "est": 20,
+          "idea": "开花时间和凋谢时间各自排序，对每个 person 二分：已开的数量减去已谢的数量。",
+          "pitfall": "开花用 <= person（含端点算开），凋谢用 < person（端点当天还没谢），两处开闭必须相反，写同一个会差一整批。",
+          "variants": [
+            "用差分+离散化重写",
+            "用事件排序+堆重写"
+          ]
+        },
+        {
+          "id": "56",
+          "title": "Merge Intervals",
+          "cn": "合并区间",
+          "tier": "optional",
+          "est": 12,
+          "idea": "按左端点排序后线性合并。",
+          "pitfall": "合并条件是 cur.l <= last.r（相邻端点相接也要合并），写成 < 会漏；合并时 last.r 要取 max，直接赋值会在包含关系时缩短区间。",
+          "variants": [
+            "写 57 插入区间",
+            "写 986 区间交集"
+          ]
+        },
+        {
+          "id": "729",
+          "title": "My Calendar I",
+          "cn": "我的日程安排表 I",
+          "tier": "optional",
+          "est": 15,
+          "idea": "用有序 map，找到第一个不小于 start 的区间检查左右两侧是否冲突。",
+          "pitfall": "区间是左闭右开，判重叠条件是 s1 < e2 && s2 < e1；用 lower_bound 后要同时检查前驱迭代器，且注意 begin() 时不能 --。",
+          "variants": [
+            "写 731/732 计数版本"
+          ]
+        },
+        {
+          "id": "287",
+          "title": "Find the Duplicate Number",
+          "cn": "寻找重复数",
+          "tier": "optional",
+          "est": 15,
+          "idea": "把数组看成函数图，Floyd 判环找入环点。",
+          "pitfall": "快慢指针第一阶段结束后，必须把其中一个重置到起点 0 再同速走，直接继续走得不到入环点；不能修改数组也不能用额外空间是题目硬约束。",
+          "variants": [
+            "用值域二分统计的写法"
+          ]
+        }
+      ]
+    }
+  ]
+}

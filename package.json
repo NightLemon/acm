@@ -1,0 +1,23 @@
+{
+  "name": "acm-prep",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && node scripts/make-sw.mjs",
+    "preview": "vite preview",
+    "icons": "node scripts/make-icons.mjs",
+    "data": "node scripts/fetch-problems.mjs && node scripts/build.mjs && node scripts/fetch-statements.mjs",
+    "rebuild": "node scripts/build.mjs",
+    "statements": "node scripts/fetch-statements.mjs"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.0.7"
+  }
+}

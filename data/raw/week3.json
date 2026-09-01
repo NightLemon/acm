@@ -1,0 +1,801 @@
+{
+  "days": [
+    {
+      "day": 15,
+      "title": "树状数组与逆序对家族",
+      "focus": "掌握树状数组的核心用法：单点改+前缀查、离散化、值域树状数组求逆序对，以及「排序消一维、BIT 消一维」的二维偏序范式。",
+      "drill": "不查资料写出三份模板，每份限时 5 分钟：(1) 一维 BIT 的 update/query，注意 lowbit(x)=x&-x、下标从 1 开始；(2) 离散化三件套 sort+unique+lower_bound，并想清楚「相同值怎么排名」对逆序对统计的影响；(3) BIT 上二分（倍增求第 k 小），从 pos=0、bit=最高 2 的幂 开始逐位试探。写完手算 [3,1,2] 的逆序对验证。",
+      "problems": [
+        {
+          "id": "315",
+          "title": "Count of Smaller Numbers After Self",
+          "cn": "计算右侧小于当前元素的个数",
+          "tier": "core",
+          "est": 40,
+          "idea": "值域离散化后从右往左扫，每个位置先 query(rank-1) 得到已插入元素中严格更小的个数，再 insert(rank)。也可以用归并排序在合并时统计。",
+          "pitfall": "query 必须是 rank-1 而不是 rank，否则把等于自己的元素算进去了。离散化时如果用 map 排名从 0 开始，BIT 下标 0 会让 lowbit 死循环，必须整体 +1。",
+          "variants": [
+            "改成统计右侧大于当前的个数（反向或用 total-query）",
+            "归并排序版本，顺便复习分治统计"
+          ]
+        },
+        {
+          "id": "493",
+          "title": "Reverse Pairs",
+          "cn": "翻转对",
+          "tier": "core",
+          "est": 40,
+          "idea": "统计 i<j 且 a[i] > 2*a[j] 的对数。BIT 做法要把 a[i] 和 2*a[j] 一起放进离散化数组；归并做法在合并前用双指针先统计再归并。",
+          "pitfall": "2*a[j] 会溢出 int，离散化数组必须用 long long。归并版本容易犯的错是「边比较边归并」，双指针 j 会被归并过程弄乱，必须先跑一遍统计循环再跑归并循环。",
+          "variants": [
+            "推广到 a[i] > k*a[j]",
+            "三元组版本的翻转关系"
+          ]
+        },
+        {
+          "id": "327",
+          "title": "Count of Range Sum",
+          "cn": "区间和的个数",
+          "tier": "core",
+          "est": 45,
+          "idea": "前缀和 S 后转化为：对每个 j，统计 i<j 中满足 S[j]-upper <= S[i] <= S[j]-lower 的个数。BIT 上离散化 S、S-lower、S-upper 三组值后做区间计数。",
+          "pitfall": "别忘了 S[0]=0 也要插入，否则漏掉以下标 0 开头的区间。离散化的候选集合必须同时含三类值，只离散化 S 会导致 lower_bound 找不到正确边界。",
+          "variants": [
+            "求区间和恰好等于 k 的个数（哈希表）",
+            "改成二维区域和计数"
+          ]
+        },
+        {
+          "id": "2179",
+          "title": "Count Good Triplets in an Array",
+          "cn": "统计数组中好三元组数目",
+          "tier": "core",
+          "est": 50,
+          "idea": "把 nums2 映射成 nums1 中的位置，问题变成在一个排列上统计 i<j<k 的递增三元组。枚举中间元素 j，用两个 BIT 分别求左侧比它小的个数 L 和右侧比它大的个数 R，答案累加 L*R。",
+          "pitfall": "R 不要再开一个 BIT 从右往左扫，直接算：右侧比它大的 = (n-1-pos) - (右侧比它小的) = (n-1-pos) - (pos - L)。乘积用 long long，n=1e5 时 L*R 轻松爆 int。",
+          "variants": [
+            "推广到统计长度为 k 的递增子序列个数（BIT + DP）",
+            "两个排列的最长公共递增关系"
+          ]
+        },
+        {
+          "id": "2426",
+          "title": "Number of Pairs Satisfying Inequality",
+          "cn": "满足不等式的数对数目",
+          "tier": "optional",
+          "est": 30,
+          "idea": "令 d[i] = nums1[i]-nums2[i]，条件化为 d[i] <= d[j] + diff，就是标准的偏序计数。离散化 d 后从左往右扫，query(d[j]+diff 的排名)。",
+          "pitfall": "d[j]+diff 可能不在离散化数组里，要用 upper_bound 求「小于等于它的个数」而不是 lower_bound，边界差一就全错。d 可以是负数，离散化不能省。",
+          "variants": [
+            "归并排序解法",
+            "改成严格小于的版本"
+          ]
+        },
+        {
+          "id": "1649",
+          "title": "Create Sorted Array through Instructions",
+          "cn": "通过指令创建有序数组",
+          "tier": "optional",
+          "est": 35,
+          "idea": "值域直接开 BIT（值 <= 1e5 不用离散化），每次插入前 query(x-1) 得到严格小的个数，total-query(x) 得到严格大的个数，取 min 累加。",
+          "pitfall": "取模是最后累加时取，但 min 必须在取模前算，先取模再比大小会错。等于 x 的元素既不算小也不算大，所以是 query(x-1) 和 cnt-query(x) 而不是 cnt-query(x-1)。",
+          "variants": [
+            "改成用平衡树/有序集合实现",
+            "维护动态中位数"
+          ]
+        },
+        {
+          "id": "1964",
+          "title": "Find the Longest Valid Obstacle Course at Each Position",
+          "cn": "找出到每个位置为止最长的有效障碍赛跑路线",
+          "tier": "core",
+          "est": 35,
+          "idea": "本质是每个前缀的最长非递减子序列长度。用 tails 数组 + upper_bound 做 O(n log n) 的 LIS，答案就是插入位置 +1。",
+          "pitfall": "「非递减」用 upper_bound，「严格递增」用 lower_bound，这里必须是 upper_bound。另外答案是每个位置各自输出，不是最终 tails 的长度。",
+          "variants": [
+            "用值域 BIT 维护前缀 max 来做 LIS",
+            "带权 LIS"
+          ]
+        },
+        {
+          "id": "975",
+          "title": "Odd Even Jump",
+          "cn": "奇偶跳",
+          "tier": "optional",
+          "est": 45,
+          "idea": "从右往左 DP，odd[i]/even[i] 表示从 i 出发第一步跳奇/偶步能否到终点。需要求「右侧大于等于 a[i] 的最小值」和「右侧小于等于 a[i] 的最大值」，用有序集合或单调栈+排序索引预处理。",
+          "pitfall": "相等的情况两边都能跳，用有序 map 时 lower_bound 就已经含相等了，别多减一。odd[i] = even[nextHigher]，注意奇偶交替，容易写成 odd[nextHigher] 而自锁。",
+          "variants": [
+            "用离散化+BIT 求前驱后继",
+            "改成允许跳到任意更大值的计数版本"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 16,
+      "title": "线段树基础与区间查询",
+      "focus": "掌握线段树的基本写法：递归建树、单点改、区间查、以及「维护什么信息可以合并」的思维。重点是 pushup 的设计而不是代码量。",
+      "drill": "限时 8 分钟写出一份数组式线段树：build/update/query 三函数，节点 x 管 [l,r]，左右儿子 2x/2x+1，mid=(l+r)>>1。然后不看代码把它改造成三个不同的 pushup：区间和、区间最大值、区间最大子段和（维护 sum/pre/suf/best 四元组）。最大子段和的合并式要能默出来：best = max(L.best, R.best, L.suf+R.pre)。",
+      "problems": [
+        {
+          "id": "307",
+          "title": "Range Sum Query - Mutable",
+          "cn": "区域和检索 - 数组可修改",
+          "tier": "core",
+          "est": 30,
+          "idea": "最裸的线段树/BIT 板子题，作为今天的开机题。BIT 版本 update 传的是差值 delta 而不是新值。",
+          "pitfall": "BIT 版本必须记录原数组，update(i,val) 要转成 add(i, val-a[i]) 并同步更新 a[i]，忘了同步就第二次修改开始全错。",
+          "variants": [
+            "改成区间修改单点查（差分 BIT）",
+            "二维版本"
+          ]
+        },
+        {
+          "id": "2407",
+          "title": "Longest Increasing Subsequence II",
+          "cn": "最长递增子序列 II",
+          "tier": "core",
+          "est": 45,
+          "idea": "dp[v] = 以值 v 结尾的最长长度 = 1 + max(dp[v-k..v-1])。用值域线段树维护区间最大值，按数组顺序逐个查询再单点更新。",
+          "pitfall": "查询区间左端点要 max(1, v-k)，不做钳制会越界。必须先查后改，顺序反了会用到自己。这题不能用 tails+二分，因为有 k 的间隔限制。",
+          "variants": [
+            "k=1 的特例（连续值）",
+            "带权版本：求最大和而不是最长长度"
+          ]
+        },
+        {
+          "id": "2940",
+          "title": "Find Building Where Alice and Bob Can Meet",
+          "cn": "找到 Alice 和 Bob 可以相遇的建筑",
+          "tier": "core",
+          "est": 45,
+          "idea": "查询 (a,b) 转化为：在 max(a,b) 之后找第一个高度 > max(h[a],h[b]) 的下标。线段树上二分（优先走左儿子，左子树最大值够大就下去）能做到单次 O(log n)。",
+          "pitfall": "先处理 a==b 或 h[a]<h[b] 且 a<b 的特判直接返回 max(a,b)，否则线段树二分会从 max(a,b) 之后开始找而漏掉自身。线段树上二分要写成递归下降，不要写成「二分答案 + 区间查最大值」的两只 log（虽然也能过但慢）。",
+          "variants": [
+            "离线 + 单调栈 + 优先队列解法",
+            "改成找第一个高度小于某值的位置"
+          ]
+        },
+        {
+          "id": "218",
+          "title": "The Skyline Problem",
+          "cn": "天际线问题",
+          "tier": "core",
+          "est": 50,
+          "idea": "扫描线：把每栋楼拆成左右两个事件点，用多重集/大根堆维护当前存活高度，每处理完一个 x 坐标就看堆顶是否变化，变化则输出关键点。",
+          "pitfall": "同一 x 处的事件排序规则是重灾区：左端点按高度降序在前、右端点按高度升序在后、且左端点整体排在右端点之前，否则会输出重复或缺失的拐点。用堆做惰性删除时，要在取堆顶前反复弹出已过期元素。",
+          "variants": [
+            "用离散化+线段树区间取 max 做",
+            "求天际线围成的面积"
+          ]
+        },
+        {
+          "id": "699",
+          "title": "Falling Squares",
+          "cn": "掉落的方块",
+          "tier": "optional",
+          "est": 45,
+          "idea": "离散化坐标后，每次落下的方块查询 [l,r-1] 区间最大高度 h，然后把该区间整体赋值为 h+size，维护全局最大值。",
+          "pitfall": "区间是左闭右开，用 r-1 作右端点，写成 r 会让相邻不重叠的方块错误叠加。离散化只放左右端点不够，最好把 l 和 r-1 都放进候选点集。",
+          "variants": [
+            "数据量小的话直接 O(n²) 暴力对拍",
+            "改成查询任意时刻某点高度"
+          ]
+        },
+        {
+          "id": "850",
+          "title": "Rectangle Area II",
+          "cn": "矩形面积 II",
+          "tier": "optional",
+          "est": 55,
+          "idea": "扫描线求矩形面积并的模板题。按 x 排序事件，线段树维护 y 轴上被覆盖的长度（cover 计数 + len），每两个相邻 x 之间累加 len * dx。",
+          "pitfall": "这棵线段树不 pushdown，只靠 cover>0 时 len=整段长度、否则 len=左右儿子之和 来上传。叶子节点代表的是「区间段」而不是「点」，所以叶子判定是 l+1==r 或者用 [i,i] 表示 y[i]~y[i+1]，混淆了会整体差一段。",
+          "variants": [
+            "求矩形周长并",
+            "求被覆盖至少两次的面积"
+          ]
+        },
+        {
+          "id": "2251",
+          "title": "Number of Flowers in Full Bloom",
+          "cn": "花期内花的数目",
+          "tier": "optional",
+          "est": 30,
+          "idea": "差分/双指针：答案 = 开始时间 <= t 的花数 - 结束时间 < t 的花数。把 start 和 end 各自排序后二分即可，不用线段树。",
+          "pitfall": "结束时间是闭区间，所以减的是 end < t 的个数，用 lower_bound(end, t)；写成 upper_bound 就把当天凋谢的花错误排除了。",
+          "variants": [
+            "用离散化差分数组做",
+            "改成求任意时刻花数的最大值"
+          ]
+        },
+        {
+          "id": "1851",
+          "title": "Minimum Interval to Include Each Query",
+          "cn": "包含每个查询的最小区间",
+          "tier": "optional",
+          "est": 40,
+          "idea": "离线：查询升序，区间按左端点升序。用小根堆按区间长度排序，把左端点 <= q 的区间入堆，再弹出右端点 < q 的堆顶，堆顶即答案。",
+          "pitfall": "弹出条件是 right < q，不是 right <= q。查询要记录原始下标再排序，最后按原下标还原答案，这一步经常忘。",
+          "variants": [
+            "在线做法：线段树维护区间最小长度",
+            "改成求包含查询点的区间个数"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 17,
+      "title": "Lazy 双标记 · 平衡树 · 分块",
+      "focus": "掌握「区间修改 + 区间查询」的 lazy 传播，尤其是加法/乘法双标记的下传顺序；并了解有序集合（平衡树）与分块这两种替代手段。",
+      "drill": "写出带 lazy 的线段树：先写 pushdown，再写 update/query。重点默两遍双标记版本——规定标记形如 x -> a*x + b，合并时新标记作用在旧标记之上：a' = a_new * a_old, b' = a_new * b_old + b_new。写完在纸上手推一段 [先加 3 再乘 2] 和 [先乘 2 再加 3] 的区别，确认公式没写反。再默一份 sqrt 分块的 update/query 框架，块大小取 sqrt(n)。",
+      "problems": [
+        {
+          "id": "1622",
+          "title": "Fancy Sequence",
+          "cn": "奇妙序列",
+          "tier": "core",
+          "est": 55,
+          "idea": "全局仿射变换 y = a*x + b。插入时把新值 v 逆变换成 (v-b)/a 存起来，查询时正变换回去。除法用模逆元（费马小定理快速幂）。",
+          "pitfall": "a 恒不为 0（初始 a=1，乘 0 时要特判或改用维护逆元的方式），modInverse 必须在 mod 为质数时才能用费马。所有中间乘法用 long long，两个接近 1e9 的数相乘必爆。",
+          "variants": [
+            "线段树双标记的等价实现",
+            "支持区间而非全局的仿射变换"
+          ]
+        },
+        {
+          "id": "2569",
+          "title": "Handling Sum Queries After Update",
+          "cn": "更新数组后处理求和查询",
+          "tier": "core",
+          "est": 55,
+          "idea": "nums1 是 01 数组，用线段树维护区间 1 的个数和「翻转」lazy。操作 2 只需 sum2 += p * cnt1（cnt1 是全局 1 的个数），不用真的动 nums2。",
+          "pitfall": "翻转 lazy 是异或型的：pushdown 时 cnt = len - cnt，且 lazy ^= 1 而不是 =1，连续两次翻转要能抵消。p 和 sum 都用 long long，1e5 * 1e5 * 1e5 级别会爆。",
+          "variants": [
+            "改成区间赋值 0/1 的 lazy",
+            "加上区间加法标记形成双标记"
+          ]
+        },
+        {
+          "id": "3187",
+          "title": "Peaks in Array",
+          "cn": "数组中的峰值",
+          "tier": "core",
+          "est": 45,
+          "idea": "把「是否为峰」标记成 01 数组丢进 BIT/线段树。单点修改 nums[i] 只会影响 i-1、i、i+1 三个位置的峰值状态，重算这三个即可。",
+          "pitfall": "查询 [l,r] 时首尾两个位置按定义不算峰，所以实际统计范围是 [l+1, r-1]，且要判 r-l < 2 时直接返回 0。修改时必须「先撤销旧的三个标记，改完值，再重算三个标记」，顺序颠倒会残留脏数据。",
+          "variants": [
+            "改成统计区间内的谷值",
+            "支持区间赋值后统计峰值"
+          ]
+        },
+        {
+          "id": "480",
+          "title": "Sliding Window Median",
+          "cn": "滑动窗口中位数",
+          "tier": "core",
+          "est": 45,
+          "idea": "对顶堆（大根堆存小的一半 + 小根堆存大的一半）+ 延迟删除，或者直接用有序容器 multiset 加一个指向中位数的迭代器。",
+          "pitfall": "对顶堆的延迟删除要额外维护每个堆的「有效元素计数」，光靠堆的 size() 判平衡会因为墓碑元素而失衡。中位数计算 (a+b)/2 会溢出，写成 a/2.0 + b/2.0 或用 long long。",
+          "variants": [
+            "用 BIT + 二分找第 k 小",
+            "改成滑动窗口第 k 小"
+          ]
+        },
+        {
+          "id": "1825",
+          "title": "Finding MK Average",
+          "cn": "求出 MK 平均值",
+          "tier": "optional",
+          "est": 60,
+          "idea": "三个有序容器分段维护「最小 k 个 / 中间 m-2k 个 / 最大 k 个」，加上一个队列维护滑动窗口。每次插入/删除后在三段之间做 rebalance。",
+          "pitfall": "rebalance 必须写成 while 循环而不是 if，一次操作可能引发跨两段的连锁调整。三段的 sum 要同步增删，任何一条路径漏更新就是纯 WA，建议把「移动一个元素」封装成函数统一处理。",
+          "variants": [
+            "用值域 BIT + 二分求第 k 小来实现",
+            "改成求去掉最大最小各 k 个后的中位数"
+          ]
+        },
+        {
+          "id": "2102",
+          "title": "Sequentially Ordinal Rank Tracker",
+          "cn": "序列顺序查询",
+          "tier": "optional",
+          "est": 35,
+          "idea": "对顶堆经典应用：小根堆存「已被查询过的前 i 名」，大根堆存其余。add 时先塞大根堆再看是否要和小根堆堆顶交换；get 时把大根堆顶移到小根堆。",
+          "pitfall": "比较函数是「分数降序、名字字典序升序」，两个方向不一致，堆的 comparator 写错方向是最常见的 bug。用有序集合 + 迭代器的写法更稳，但 add 后迭代器可能需要回退一位。",
+          "variants": [
+            "用平衡树 + 排名查询实现",
+            "支持删除地点"
+          ]
+        },
+        {
+          "id": "2276",
+          "title": "Count Integers in Intervals",
+          "cn": "统计区间中的整数数目",
+          "tier": "optional",
+          "est": 40,
+          "idea": "用有序 map 维护不相交区间。add(l,r) 时找到所有与 [l,r] 相交的区间合并掉，同时维护总覆盖长度 cnt。",
+          "pitfall": "查找起点要用 upper_bound(l) 再退一格，判断前一个区间的 right >= l-1（注意是 l-1，相邻区间也要合并）。删除时用 erase 返回的迭代器继续循环，边遍历边 erase 不接返回值是未定义行为。",
+          "variants": [
+            "支持区间删除（Range Module）",
+            "改成查询某点是否被覆盖"
+          ]
+        },
+        {
+          "id": "715",
+          "title": "Range Module",
+          "cn": "Range 模块",
+          "tier": "optional",
+          "est": 50,
+          "idea": "同样是有序 map 维护不相交区间，但多了 removeRange，需要处理「一个区间被从中间挖空裂成两段」的情况。也可用动态开点线段树 + 区间赋值 lazy。",
+          "pitfall": "remove 时要先把左边界被截断的区间存下来再 erase，直接改 key 会破坏 map 有序性。queryRange 必须是完全覆盖，找到的区间 right 必须 >= r，只判 left <= l 不够。",
+          "variants": [
+            "动态开点线段树版本",
+            "改成支持区间计数而不只是布尔"
+          ]
+        },
+        {
+          "id": "2286",
+          "title": "Booking Concert Tickets in Groups",
+          "cn": "以组为单位订音乐会的门票",
+          "tier": "optional",
+          "est": 55,
+          "idea": "线段树同时维护每排剩余座位的 max 和 sum。gather 用线段树上二分找最左边 max >= k 的排；scatter 从左往右贪心，用 sum 剪枝整棵子树。",
+          "pitfall": "gather 的线段树二分要先判子树 max 再下降，写成先查询区间 max 再二分位置会多一只 log 导致 TLE。scatter 要维护一个「起始搜索排」指针跳过已满的排，否则每次从 0 扫会退化成 O(n) 每次。",
+          "variants": [
+            "只支持 gather 的简化版",
+            "改成从右往左分配"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 18,
+      "title": "KMP · Z 函数 · 字符串哈希",
+      "focus": "掌握三大字符串工具的模板：KMP 的 next 数组语义、Z 函数的 [l,r] 窗口维护、双模数滚动哈希的构造与查询。",
+      "drill": "限时写出三个模板：(1) KMP 的 next/fail 数组构造，j 回退用 while(j && s[i]!=s[j]) j=nxt[j-1]，注意 nxt[i] 的定义是「前 i+1 个字符的最长真 border 长度」；(2) Z 函数，维护 [l,r] 为最靠右的匹配段，z[i] 初值取 min(z[i-l], r-i+1) 后暴力扩展，扩展成功再更新 l=i,r=i+z[i]-1；(3) 单/双哈希，预处理 pw 和 h，子串哈希 = h[r+1] - h[l]*pw[r-l+1]，取模后可能为负要 +mod。写完用 \"aabaaab\" 手验 next 数组。",
+      "problems": [
+        {
+          "id": "214",
+          "title": "Shortest Palindrome",
+          "cn": "最短回文串",
+          "tier": "core",
+          "est": 35,
+          "idea": "求 s 的最长回文前缀。构造 s + '#' + reverse(s)，跑 KMP 的 next 数组，最后一位的值就是最长回文前缀长度，把剩余部分反转拼到前面。",
+          "pitfall": "分隔符必须是原串中不出现的字符，否则 border 会跨界匹配出错误答案。next 数组的最后一个值可能超过 n（若无分隔符），加分隔符正是为了防这个。",
+          "variants": [
+            "用 Manacher 求最长回文前缀",
+            "改成最短回文后缀"
+          ]
+        },
+        {
+          "id": "1392",
+          "title": "Longest Happy Prefix",
+          "cn": "最长快乐前缀",
+          "tier": "core",
+          "est": 30,
+          "idea": "就是求最长真 border，KMP 的 next[n-1] 直接给出答案。或者用前后缀双向滚动哈希逐位比较。",
+          "pitfall": "「真」border 意味着不能等于整个串，KMP 的 next 定义天然排除了，但哈希做法要显式让长度从 n-1 开始枚举。哈希单模数在本题的数据下容易被卡，建议双模。",
+          "variants": [
+            "求所有 border（沿 next 链跳）",
+            "求字符串的最小循环节 n - next[n-1]"
+          ]
+        },
+        {
+          "id": "3031",
+          "title": "Minimum Time to Revert Word to Initial State II",
+          "cn": "将单词恢复初始状态所需的最短时间 II",
+          "tier": "core",
+          "est": 40,
+          "idea": "每次操作删前 k 个再补 k 个任意字符，所以第 t 次能恢复当且仅当 s 的长度为 n-t*k 的后缀等于同长度的前缀，即是一个 border。用 Z 函数判 z[t*k] == n - t*k。",
+          "pitfall": "答案上界是 ceil(n/k)，循环到 t*k >= n 时直接返回 t，忘了这个兜底会漏解。用 Z 函数时判的是 z[i] + i == n（后缀与前缀匹配到底），只判 z[i] >= 某值是错的。",
+          "variants": [
+            "用 KMP 沿 next 链找所有 border 判断",
+            "k=1 的特例"
+          ]
+        },
+        {
+          "id": "3008",
+          "title": "Find Beautiful Indices in the Given Array II",
+          "cn": "找出数组中的美丽下标 II",
+          "tier": "core",
+          "est": 40,
+          "idea": "用 KMP 分别求出 a 和 b 在 s 中的所有出现位置得到两个有序数组，然后对每个 a 的位置在 b 的位置数组里二分，检查是否存在落在 [i-k, i+k] 内的元素。",
+          "pitfall": "二分后要同时检查 lower_bound 结果和它的前一个，只查一侧会漏。下标可能越界（it == begin 或 == end），两边都要判。",
+          "variants": [
+            "用双指针代替二分",
+            "改成统计满足条件的对数"
+          ]
+        },
+        {
+          "id": "1044",
+          "title": "Longest Duplicate Substring",
+          "cn": "最长重复子串",
+          "tier": "core",
+          "est": 50,
+          "idea": "二分答案长度 L，用滚动哈希把所有长为 L 的子串哈希丢进哈希表判重复。经典的「二分 + Rabin-Karp」。",
+          "pitfall": "单模数 1e9+7 在这题会被 hack，必须双哈希或用随机 base + unsigned long long 自然溢出。哈希冲突时要真的比较原串，或者接受双哈希的概率保证。滚动更新公式 h = h*base - s[i-L]*pw[L] + s[i]，减法后取模要修正负数。",
+          "variants": [
+            "后缀数组 + height 数组的 O(n log n) 解法",
+            "求出现至少 k 次的最长子串"
+          ]
+        },
+        {
+          "id": "1923",
+          "title": "Longest Common Subpath",
+          "cn": "最长公共子路径",
+          "tier": "optional",
+          "est": 60,
+          "idea": "二分公共子路径长度 L，对每条路径用滚动哈希求出所有长 L 子段的哈希集合，求所有集合的交集是否非空。",
+          "pitfall": "同一条路径内相同哈希会重复计数，必须先对每条路径的哈希集合去重再做交集，否则某条路径自己出现两次就被误判为「在两条路径里都出现」。数据量大，用双哈希打包成 unsigned long long 再放 unordered_set 才不会 TLE。",
+          "variants": [
+            "改成两条路径的最长公共子段",
+            "后缀自动机解法"
+          ]
+        },
+        {
+          "id": "1316",
+          "title": "Distinct Echo Substrings",
+          "cn": "不同的循环子字符串",
+          "tier": "optional",
+          "est": 45,
+          "idea": "枚举半长 L，判断 s[i..i+L-1] 与 s[i+L..i+2L-1] 是否相等（哈希 O(1)），把相等的整段哈希塞进 set 去重。",
+          "pitfall": "去重的是 2L 长的整串，不是半串，塞错了会少算。n=2000 时 O(n²) 的枚举加 set 插入可能卡常，用数组 + 排序去重或按 L 分层用 set 更稳。",
+          "variants": [
+            "用 Z 函数在每个位置判周期",
+            "求最长的 echo 子串"
+          ]
+        },
+        {
+          "id": "2223",
+          "title": "Sum of Scores of Built Strings",
+          "cn": "构造字符串的总得分和",
+          "tier": "optional",
+          "est": 35,
+          "idea": "score[i] = s 的后缀 s[i..] 与 s 本身的最长公共前缀长度，正是 Z 函数的定义。答案 = n + sum(z[1..n-1])。",
+          "pitfall": "z[0] 按惯例是 0 或未定义，要单独把 n 加上。Z 函数扩展时的边界 while(i+z[i] < n && s[z[i]] == s[i+z[i]])，两个下标一个从 0 走一个从 i 走，写混就是死循环或越界。",
+          "variants": [
+            "用哈希 + 二分求每个 LCP",
+            "改成求所有后缀两两 LCP 之和"
+          ]
+        },
+        {
+          "id": "3045",
+          "title": "Count Prefix and Suffix Pairs II",
+          "cn": "统计前后缀下标对 II",
+          "tier": "optional",
+          "est": 45,
+          "idea": "isPrefixAndSuffix(a,b) 等价于 a 同时是 b 的前缀和后缀。把每个串按「(第 i 个字符, 倒数第 i 个字符)」的字符对建 Trie，插入时沿途累加计数即可。",
+          "pitfall": "字符对 Trie 的分支是 26*26=676，用 map 存子节点比数组省内存，但要注意常数。累加是「插入过程中经过的每个节点的已有计数」，插入后才自增，顺序反了会把自己算进去。",
+          "variants": [
+            "用双哈希 + map 计数",
+            "只判前缀的简化版"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 19,
+      "title": "Manacher · 数论 · 组合计数",
+      "focus": "掌握回文的线性处理（Manacher）与模意义下的计数工具箱：阶乘逆元预处理、乘法逆元、快速幂、以及把计数问题拆成独立组合乘积的思维。",
+      "drill": "写出两份模板。(1) Manacher：先把 s 插成 '#a#b#a#'，维护 mx（当前右边界）和 id（对应中心），p[i] 初值 = (i < mx) ? min(p[2*id-i], mx-i) : 1，暴力扩展后若 i+p[i] > mx 则更新 mx=i+p[i], id=i。答案 = max(p[i])-1。手推 \"aba\" 验证。(2) 组合数：预处理 fac[i] 和 inv_fac[i]，inv_fac[n] 用快速幂求一次，然后 inv_fac[i-1] = inv_fac[i]*i 倒推，C(n,m) = fac[n]*inv_fac[m]%mod*inv_fac[n-m]%mod。写清 m<0 或 m>n 时返回 0 的守卫。",
+      "problems": [
+        {
+          "id": "1745",
+          "title": "Palindrome Partitioning IV",
+          "cn": "回文串分割 IV",
+          "tier": "core",
+          "est": 40,
+          "idea": "预处理 isPal[i][j]（区间 DP 或 Manacher），然后枚举两个切点 i<j 判三段是否都回文。n=2000 时 O(n²) 完全可行。",
+          "pitfall": "区间 DP 的循环顺序必须按长度递增（或 i 倒序 j 正序），否则用到未计算的 isPal[i+1][j-1]。用 Manacher 时把 p 数组转成 isPal 查询要小心奇偶中心的下标映射，容易差一。",
+          "variants": [
+            "分割成 k 段的推广（DP）",
+            "求最少分割次数"
+          ]
+        },
+        {
+          "id": "1960",
+          "title": "Maximum Product of the Length of Two Palindromic Substrings",
+          "cn": "两个回文子字符串长度的最大乘积",
+          "tier": "core",
+          "est": 60,
+          "idea": "用 Manacher 求每个中心的奇回文半径，再前缀/后缀扫出 pre[i]（[0,i] 内最长奇回文长度）和 suf[i]，最后枚举分界点取 max(pre[i-1]*suf[i])。",
+          "pitfall": "本题只要奇长度回文，别套通用的加 '#' 版本再乱转换。pre 数组的推导不是简单的 max，要保证回文完全落在 [0,i] 内：从每个中心能贡献的最右端点出发做一遍「收缩」，即对每个右端点先取该处能达成的最大长度再做前缀 max。这一步写错是本题主要失分点。",
+          "variants": [
+            "改成三段乘积",
+            "允许偶长度回文"
+          ]
+        },
+        {
+          "id": "2338",
+          "title": "Count the Number of Ideal Arrays",
+          "cn": "统计理想数组的数目",
+          "tier": "core",
+          "est": 60,
+          "idea": "理想数组的严格递增「骨架」由质因数分解决定：若数组中不同值有 k 个（即经过 k-1 次真正的倍增），则把 n 个位置分配给这 k 段的方案数是 C(n-1, k-1)。枚举最大值 x 及其质因数指数分布，用隔板法组合。",
+          "pitfall": "k 最多约 log2(1e4) ≈ 14，枚举上界要卡住。组合数 C(n-1,k-1) 中 n 可达 1e4，阶乘表要开够。质因数指数 e 分到 k 段是 C(e+k-1, k-1) 的可重组合，写成 C(e+k-1, e) 也对但别写成 C(e,k)。",
+          "variants": [
+            "只求单调不减数组的计数",
+            "限制最大值的版本"
+          ]
+        },
+        {
+          "id": "1866",
+          "title": "Number of Ways to Rearrange Sticks With K Sticks Visible",
+          "cn": "恰有 K 根木棍可以看到的排列数目",
+          "tier": "core",
+          "est": 40,
+          "idea": "第一类斯特林数。递推 f[n][k] = f[n-1][k-1] + (n-1)*f[n-1][k]：最矮的棍要么放最左（可见，+1）要么放在其余 n-1 根之后的任一位置（不可见）。",
+          "pitfall": "转移系数是 (n-1) 不是 n，从「考虑最矮的那根」推导才自然。滚动数组优化时 k 必须倒序遍历，正序会用到本轮已更新的值。边界 f[0][0]=1。",
+          "variants": [
+            "改成从两端都能看到的计数",
+            "求可见数 <= k 的方案数"
+          ]
+        },
+        {
+          "id": "2514",
+          "title": "Count Anagrams",
+          "cn": "统计同位异构字符串数目",
+          "tier": "optional",
+          "est": 35,
+          "idea": "每个单词的异位词数 = len! / (c1! * c2! * ...)，全部相乘。用阶乘 + 逆元在模意义下计算。",
+          "pitfall": "除法必须用逆元，且逆元只求一次（把所有 ci! 乘起来再求一次逆元，比每个都求快）。字符计数数组每个单词要清零，忘了清是经典 bug。",
+          "variants": [
+            "求字典序第 k 个异位词",
+            "限制某些字符相邻的版本"
+          ]
+        },
+        {
+          "id": "1359",
+          "title": "Count All Valid Pickup and Delivery Options",
+          "cn": "有效的快递序列数目",
+          "tier": "optional",
+          "est": 30,
+          "idea": "增量推导：已有 i-1 对的合法序列长 2(i-1)，插入第 i 对时有 C(2i-1+1, 2) = i*(2i-1) 种放法。所以 f[i] = f[i-1] * i * (2i-1)。",
+          "pitfall": "i*(2i-1) 在 i=500 时也就 5e5，但和 f[i-1]（接近 mod）相乘会爆 int，必须 long long 并且每步取模。别试图用 (2n)!/2^n 再求逆元，容易在 2 的逆元上算错。",
+          "variants": [
+            "三元组（取、中转、送）的推广",
+            "带部分固定顺序约束的版本"
+          ]
+        },
+        {
+          "id": "2183",
+          "title": "Count Array Pairs Divisible by K",
+          "cn": "统计可以被 K 整除的下标对数目",
+          "tier": "optional",
+          "est": 40,
+          "idea": "对每个 a[i] 只关心 g = gcd(a[i], k)。统计每个 g 的出现次数，然后枚举两个约数 g1、g2 判 g1*g2 % k == 0，用 map 计数累加。",
+          "pitfall": "k 的约数最多约 128 个，枚举约数对是 O(d²) 可行。g1 == g2 时组合数是 C(cnt,2) 而不是 cnt²，这个分支必须单独写。",
+          "variants": [
+            "改成三元组乘积可被 k 整除",
+            "用莫比乌斯反演做"
+          ]
+        },
+        {
+          "id": "1862",
+          "title": "Sum of Floored Pairs",
+          "cn": "向下取整数对和",
+          "tier": "optional",
+          "est": 45,
+          "idea": "对每个不同的值 y，枚举倍数区间 [q*y, (q+1)*y - 1]，该区间内所有 x 的 floor(x/y) 都是 q。用值域前缀和 O(V/y) 处理每个 y，总复杂度是调和级数 O(V log V)。",
+          "pitfall": "要按不同的 y 值分组，乘上 cnt[y]，不是对每个下标都跑一遍。区间右端点要与最大值取 min。累加和很大，全程 long long，取模放在最外层累加处。",
+          "variants": [
+            "求 sum of ceil 的版本",
+            "改成 gcd 求和（欧拉函数 / 莫比乌斯）"
+          ]
+        },
+        {
+          "id": "2376",
+          "title": "Count Special Integers",
+          "cn": "统计特殊整数的数目",
+          "tier": "optional",
+          "est": 45,
+          "idea": "数位 DP 模板：记忆化搜索 dfs(pos, mask, isLimit, isNum)，mask 是已用数字的位掩码，isNum 处理前导零。",
+          "pitfall": "记忆化只能在 !isLimit && isNum 时命中缓存，否则不同上界的状态会互相污染。isNum 为假时可以选择「继续跳过」，此时不能设 mask 位；忘了这条前导零逻辑会把 0 也当成用过的数字。",
+          "variants": [
+            "233 数字 1 的个数（另一类数位 DP）",
+            "1012 数字重复的数（补集）"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 20,
+      "title": "顶档 Hard（上）· 状压与博弈",
+      "focus": "今天全是硬骨头，重点是状压 DP 的状态设计、子集枚举技巧，以及博弈类记忆化搜索的状态定义与平局处理。目标不是全 AC，而是能在 40 分钟内说清状态与转移。",
+      "drill": "写出子集枚举：for (int sub = mask; sub; sub = (sub-1) & mask) 及其补集 mask ^ sub，并说清它的复杂度是 3^n 而不是 4^n。再默一份带「胜/负/平」三态的博弈记忆化框架：当前方存在一步走到对方必败态则本方必胜；所有走法都通向对方必胜则本方必败；否则平局（需要 BFS 逆推或加轮次维度）。",
+      "problems": [
+        {
+          "id": "1595",
+          "title": "Minimum Cost to Connect Two Groups of Points",
+          "cn": "连通两组点的最小成本",
+          "tier": "core",
+          "est": 70,
+          "idea": "dp[i][mask]：处理完第一组前 i 个点、第二组覆盖状态为 mask 的最小代价。转移时第一个点必须至少连一条边，可以连多条——用「先强制连一条最小的，再任选子集」或者直接对每个 j 做 dp[i+1][mask|1<<j]。",
+          "pitfall": "第二组中未被覆盖的点最后必须补上，代价是它到第一组的最小边，要么在 DP 结尾统一处理要么预处理 minCost[j]。关键是别漏掉「i 连了多条边」的路径。",
+          "variants": [
+            "改成最大权匹配（KM 算法）",
+            "两组规模都很大时的费用流建模"
+          ]
+        },
+        {
+          "id": "1659",
+          "title": "Maximize Grid Happiness",
+          "cn": "最大化网格幸福感",
+          "tier": "core",
+          "est": 80,
+          "idea": "轮廓线状压：按格子逐个处理，状态记录最近 n 个格子的类型（三进制：空/内向/外向），加上剩余内向人数和外向人数。转移时计算与上方、左方邻居的交互得分。",
+          "pitfall": "必须用三进制而不是两个二进制掩码，否则区分不了「空」和某类人。左邻居在行首时不存在，要用 (index % n != 0) 判断，漏判会跨行错误计分。得分是双向的：放一个人时既要减自己的分也要减邻居的分（共 2 次调整）。",
+          "variants": [
+            "只有一类人的简化版",
+            "改成最小化冲突"
+          ]
+        },
+        {
+          "id": "1723",
+          "title": "Find Minimum Time to Finish All Jobs",
+          "cn": "完成所有工作的最短时间",
+          "tier": "core",
+          "est": 60,
+          "idea": "二分答案 limit + 状压/DFS 判定：能否把 jobs 分成 k 组每组和 <= limit。或者直接 dp[k][mask] = 最小的最大值，用子集枚举转移。",
+          "pitfall": "DFS 剪枝必须做两件事：jobs 降序排序（大的先放限制更紧），以及「若把当前 job 放进一个空工人失败则直接返回」（对称性剪枝），否则必 TLE。子集枚举版本要先预处理每个 mask 的和。",
+          "variants": [
+            "1655 分发重复整数",
+            "1681 最小不兼容性"
+          ]
+        },
+        {
+          "id": "1728",
+          "title": "Cat and Mouse II",
+          "cn": "猫和老鼠 II",
+          "tier": "core",
+          "est": 90,
+          "idea": "状态 (mousePos, catPos, turn)，turn 有上界（可证明 1000 步左右后若老鼠没赢就是猫赢，或用 m*n*2 的界）。记忆化搜索，每步枚举四个方向的 1..jump 格。",
+          "pitfall": "turn 的上界不能拍脑袋写太小也不能写太大（会 MLE）。跳跃时遇到墙必须停止该方向的继续延伸（break 而不是 continue），这是最容易写错的一处。原地不动（跳 0 步）也是合法走法，要显式包含。",
+          "variants": [
+            "913 猫和老鼠（BFS 逆推三态）",
+            "改成多只猫"
+          ]
+        },
+        {
+          "id": "3149",
+          "title": "Find the Minimum Cost Array Permutation",
+          "cn": "找出分数最低的排列",
+          "tier": "optional",
+          "est": 75,
+          "idea": "状压 DP 求最小代价哈密顿回路，并且要输出字典序最小的方案。固定起点为 0（回路可旋转），dp[mask][last]，再从前往后贪心地按字典序选下一个点还原路径。",
+          "pitfall": "字典序最小的还原不能反向回溯路径，要正向：在每一步从小到大试候选 j，判断 cost + dp[mask|1<<j][j] 是否等于最优值，第一个满足的就取。固定起点 0 的合法性需要论证（本题分数定义是环形的）。",
+          "variants": [
+            "943 最短超级串",
+            "847 访问所有节点的最短路径"
+          ]
+        },
+        {
+          "id": "1879",
+          "title": "Minimum XOR Sum of Two Arrays",
+          "cn": "两个数组最小的异或值之和",
+          "tier": "optional",
+          "est": 50,
+          "idea": "标准的状压二分图最小权完美匹配：dp[mask] 表示 nums1 的前 popcount(mask) 个已匹配、nums2 使用状态为 mask 的最小代价。",
+          "pitfall": "i = popcount(mask) 这个技巧省掉了一维，但要确保 mask 按 popcount 隐式有序（正常从 0 到 2^n 遍历就满足）。i 越界要判：popcount(mask) == n 时不再转移。",
+          "variants": [
+            "2172 数组的最大与和（每个槽可放两个）",
+            "KM 算法解 n 较大的版本"
+          ]
+        },
+        {
+          "id": "956",
+          "title": "Tallest Billboard",
+          "cn": "最高的广告牌",
+          "tier": "optional",
+          "est": 55,
+          "idea": "dp[d] = 在两堆高度差为 d 时，较矮那堆的最大高度。每根棍有三种选择：不用、加到高堆、加到矮堆（可能翻转差值）。",
+          "pitfall": "状态定义成「差值 -> 矮堆高度」而不是「两堆高度」是关键的降维。转移「加到矮堆」时若 x > d，新差值是 x-d 且新矮堆高度是 dp[d]+d；写成 dp[d] 就漏了那 d。差值范围要偏移到非负下标。",
+          "variants": [
+            "1755 最接近目标值的子序列和（折半搜索）",
+            "2035 分割数组使差值最小"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 21,
+      "title": "顶档 Hard（下）· 表达式解析与综合数据结构",
+      "focus": "收尾周：啃两类最能拉开差距的题——复杂表达式/语法解析（递归下降），以及需要多种数据结构复合的综合 Hard。目标是把「读题 → 建模 → 选结构」的链路跑通。",
+      "drill": "手写一份递归下降解析器的骨架：全局 pos 指针 + parseExpr / parseTerm / parseFactor 三层，parseExpr 处理 +-，parseTerm 处理 */，parseFactor 处理数字和括号。写清 skipSpaces 的位置（每次 token 前后各一次最稳）和「遇到 ')' 立即返回并让上层消费」的约定。然后把它扩展成支持负号、多位数、以及变量替换。",
+      "problems": [
+        {
+          "id": "770",
+          "title": "Basic Calculator IV",
+          "cn": "基本计算器 IV",
+          "tier": "core",
+          "est": 90,
+          "idea": "递归下降解析 + 多项式代数。每个中间结果是一个 map<vector<string>, int>（单项式的变量列表 -> 系数），实现多项式的加减乘，最后按「次数降序、同次字典序」输出。",
+          "pitfall": "单项式的变量列表必须排序后作为 key，否则 a*b 和 b*a 被当成两项。系数为 0 的项必须删除，否则输出多余项。乘法是 O(项数²)，注意合并。输出格式是 \"系数*变量*变量\"，纯常数项没有 '*'。",
+          "variants": [
+            "224/227 基本计算器 I/II（先热身）",
+            "736 Lisp 表达式求值"
+          ]
+        },
+        {
+          "id": "736",
+          "title": "Parse Lisp Expression",
+          "cn": "Lisp 语法解析",
+          "tier": "core",
+          "est": 70,
+          "idea": "递归求值 + 作用域链。用 map<string, vector<int>> 作为变量栈，进入 let 时压入绑定，离开时弹出。let 的绑定是顺序生效的（后面的表达式能看到前面的绑定）。",
+          "pitfall": "切分 token 时不能简单按空格 split，必须按括号深度做，深度为 0 的空格才是分隔符。let 的最后一个 token 是返回表达式而不是绑定，循环条件要用 i+1 < tokens.size()。变量名可能与关键字前缀相同，判断类型要看完整 token。",
+          "variants": [
+            "1096 花括号展开 II",
+            "支持 lambda 的扩展"
+          ]
+        },
+        {
+          "id": "2019",
+          "title": "The Score of Students Solving Math Expression",
+          "cn": "解出数学表达式的学生分数",
+          "tier": "core",
+          "est": 80,
+          "idea": "区间 DP 求「所有可能的加括号顺序下的结果集合」：dp[i][j] 是子表达式 [i,j] 的可能值集合，枚举分割点合并。再把学生答案对照正确答案（按优先级算）和集合打分。",
+          "pitfall": "题目限定值 <= 1000，必须在合并时剪掉超过 1000 的结果，否则集合爆炸直接 TLE/MLE。i、j 的步长是 2（数字在偶数位、运算符在奇数位），写成步长 1 会把运算符当操作数。正确答案 5 分优先于集合内 2 分，判断顺序不能反。",
+          "variants": [
+            "241 为运算表达式设计优先级",
+            "1896 改变表达式最终值的最小代价"
+          ]
+        },
+        {
+          "id": "1896",
+          "title": "Minimum Cost to Change the Final Value of Expression",
+          "cn": "反转表达式值的最少操作次数",
+          "tier": "core",
+          "est": 80,
+          "idea": "解析布尔表达式的同时对每个子表达式维护二元组 (cost0, cost1) = 把它变成 0 / 1 的最小代价。合并时枚举左右各变成什么以及是否翻转运算符（翻转代价 1）。",
+          "pitfall": "运算符可以被修改（& 变 | 或反之），所以合并时要考虑 4 种左右取值 × 2 种运算符，共 8 条路径取 min，只算原运算符会漏解。叶子 '0' 的 (cost0,cost1) = (0,1)。用双栈（值栈 + 运算符栈）迭代实现时，遇到 ')' 要一路弹到 '('。",
+          "variants": [
+            "2019 学生分数（区间 DP 版本）",
+            "支持 NOT 运算符的扩展"
+          ]
+        },
+        {
+          "id": "1912",
+          "title": "Design Movie Rental System",
+          "cn": "设计电影租借系统",
+          "tier": "optional",
+          "est": 60,
+          "idea": "三套结构：map<(shop,movie), price> 查价；每部电影一个有序集合存 (price, shop) 的未租出条目；一个全局有序集合存 (price, shop, movie) 的已租出条目。四个操作都是 O(log n) 的增删查。",
+          "pitfall": "drop 时要把条目放回对应电影的可租集合，rent 时要从中删除——这两步必须严格配对，任何一处漏掉就会出现幽灵条目。排序 key 的比较顺序是 (price, shop) 而不是 (shop, price)，写反直接全错。search/report 只取前 5 个，用迭代器截断别整个复制。",
+          "variants": [
+            "用堆 + 惰性删除实现",
+            "扩展到支持按类别筛选"
+          ]
+        },
+        {
+          "id": "2213",
+          "title": "Longest Substring of One Repeating Character",
+          "cn": "由单个字符重复的最长子字符串",
+          "tier": "optional",
+          "est": 70,
+          "idea": "线段树，每个节点维护：区间最长同字符段 best、前缀同字符段 pre、后缀同字符段 suf、以及首尾字符和区间长度。pushup 时若左儿子末字符 == 右儿子首字符则可以跨界拼接。",
+          "pitfall": "pre 的合并：若左儿子整段同字符且左末 == 右首，则 pre = 左长 + 右.pre，否则 pre = 左.pre；suf 对称。漏掉「整段同字符」这个条件是最常见的 bug。best 要在三者（左best、右best、左suf+右pre）中取 max，且拼接项只在字符相同时才成立。",
+          "variants": [
+            "带区间赋值 lazy 的版本",
+            "改成统计不同字符段的数量"
+          ]
+        },
+        {
+          "id": "3244",
+          "title": "Shortest Distance After Road Addition Queries II",
+          "cn": "新增道路查询后的最短距离 II",
+          "tier": "optional",
+          "est": 50,
+          "idea": "题目保证新增的路不交叉嵌套，所以每次加边 (l,r) 相当于把 (l,r) 之间的所有中间节点「合并掉」。用有序集合维护还存活的节点，每次删掉 (l,r) 开区间内的节点，答案 = 剩余节点数 - 1。",
+          "pitfall": "删除的是开区间 (l, r)，端点必须保留。用 set 的 erase(first, last) 一次性删比逐个删快，但要先算出正确的迭代器范围。若 l 或 r 已被之前的操作删除（题目保证不会），仍建议加防御性判断。",
+          "variants": [
+            "I 版本（允许嵌套，每次跑 BFS）",
+            "改成带权边的版本"
+          ]
+        }
+      ]
+    }
+  ]
+}
