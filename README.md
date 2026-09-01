@@ -1,15 +1,26 @@
 # 算法训练 · 28 天课程
 
-一个本地运行的刷题课程 Web App。展示**完整题面 + 解题提示**，不做 judge——代码写在 LeetCode 上提交，这里负责组织「今天练什么、题目是什么、卡住了看什么」。
+一个刷题课程 Web App。展示**完整题面 + 解题提示**，不做 judge——代码写在 LeetCode 上提交，这里负责组织「今天练什么、题目是什么、卡住了看什么」。
 
-## 启动
+**在线地址：https://nightlemon.github.io/acm/**
+
+## 手机上使用
+
+用手机浏览器打开上面的地址，然后：
+
+- **iOS Safari** — 分享按钮 → 「添加到主屏幕」
+- **Android Chrome** — 右上角菜单 → 「安装应用」/「添加到主屏幕」
+
+装好之后是全屏的，没有浏览器地址栏。首次打开后建议点侧栏底部的**「离线缓存题面」**，把 194 道题的题面一次性存到本机，之后没网也能看（题面里的插图仍需要网络）。
+
+## 本地启动
 
 ```bash
 npm install
 npm run dev
 ```
 
-浏览器会自动打开 http://localhost:5180
+浏览器会自动打开 http://localhost:5180 。同一局域网内手机也能访问终端里打印的 Network 地址。
 
 ## 结构
 
@@ -20,7 +31,7 @@ npm run dev
 - **系统设计** — 框架 + 组件 + 7 个案例
 - **语言细节** — 速查附录
 
-进度存在浏览器 localStorage（key `acm-prep-progress-v1`），换浏览器不通用。侧栏底部可以清空。
+进度存在浏览器 localStorage（key `acm-prep-progress-v1`），换设备不同步。侧栏底部可以清空。
 
 ## 每道题看到什么
 
@@ -55,6 +66,22 @@ npm run data         # 全量：重抓索引 + 合并校验 + 抓题面
 ```
 
 `npm run statements -- --force` 可以强制重抓全部题面。
+
+## 部署
+
+推到 `main` 会触发 `.github/workflows/deploy.yml`，自动构建并发布到 GitHub Pages。
+构建时会先跑 `npm run rebuild` 校验题号，**题号写错会让 CI 失败而不是把错误内容发出去**。
+
+`vite.config.js` 的 `base` 由环境变量 `BASE_PATH` 控制（workflow 里设成 `/<仓库名>/`），
+本地开发和 `vite preview` 用默认的 `/`。
+
+### 离线是怎么做的
+
+`scripts/make-sw.mjs` 在 `vite build` 之后读取真实的 `dist/` 产物生成 `sw.js`：
+
+- **App shell**（HTML/JS/CSS/图标/manifest）在 Service Worker 安装时全量预缓存
+- **题面**按需缓存——打开一道题就存一道，或者用侧栏的按钮一次性存全部
+- 缓存名带 shell 内容的哈希，所以每次改动都会自然失效旧缓存
 
 ## 用法建议
 
