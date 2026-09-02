@@ -1,7 +1,9 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import curriculum from '../data/curriculum.json';
 import { useProgress } from './useProgress.js';
 import { useOfflineSync } from './useOfflineSync.js';
+import { useNotes } from './useNotes.js';
+import { useTimers } from './useTimers.js';
 import { Ring } from './components/ui.jsx';
 import { AlgoView } from './components/AlgoView.jsx';
 import { MockView } from './components/MockView.jsx';
@@ -58,6 +60,30 @@ export default function App() {
 
   const current = NAV.find((n) => n.key === view);
   const offline = useOfflineSync(allIds);
+
+  // Which problem row is expanded. Lifted out of ProblemRow so it survives
+  // filtering and day switching, and so only one problem is open at a time —
+  // which is also what makes the think-timer meaningful.
+  const [openId, setOpenId] = useState(null);
+  const { notes, setNote } = useNotes();
+  const timers = useTimers();
+
+  const onOpen = useCallback((id, next) => {
+    setOpenId((prev) => {
+      if (prev) timers.stop(prev);
+      if (next) { timers.start(id); return id; }
+      return null;
+    });
+  }, [timers]);
+
+  // Bundle what every ProblemRow needs so views can forward it as one prop.
+  const rowProps = {
+    openId,
+    onOpen,
+    notes,
+    onNote: setNote,
+    timers,
+  };
 
   const go = (key) => { setView(key); setNavOpen(false); };
   return (
@@ -133,10 +159,10 @@ export default function App() {
 
       <main className="main">
         <div className="main-inner">
-          {view === 'w1' && <AlgoView days={algoDays} week={1} done={done} toggle={toggle} />}
-          {view === 'w2' && <AlgoView days={algoDays} week={2} done={done} toggle={toggle} />}
-          {view === 'w3' && <AlgoView days={algoDays} week={3} done={done} toggle={toggle} />}
-          {view === 'w4' && <MockView mock={mock} done={done} toggle={toggle} />}
+          {view === 'w1' && <AlgoView days={algoDays} week={1} done={done} toggle={toggle} rows={rowProps} />}
+          {view === 'w2' && <AlgoView days={algoDays} week={2} done={done} toggle={toggle} rows={rowProps} />}
+          {view === 'w3' && <AlgoView days={algoDays} week={3} done={done} toggle={toggle} rows={rowProps} />}
+          {view === 'w4' && <MockView mock={mock} done={done} toggle={toggle} rows={rowProps} />}
           {view === 'design' && <DesignView design={design} />}
           {view === 'fund' && <FundamentalsView fundamentals={fundamentals} handwritten={handwritten} />}
         </div>

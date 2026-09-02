@@ -8,7 +8,7 @@ const STRAT_LABELS = {
   debugging: '卡住了怎么查',
 };
 
-export function MockView({ mock, done, toggle }) {
+export function MockView({ mock, done, toggle, rows }) {
   const days = mock?.days || [];
   const [active, setActive] = useState(null);
 
@@ -76,7 +76,20 @@ export function MockView({ mock, done, toggle }) {
 
           <div className="plist">
             {(d.problems || []).map((p) => (
-              <ProblemRow key={p.id} p={p} done={!!done[p.id]} onToggle={toggle} />
+              <ProblemRow
+                key={p.id}
+                p={p}
+                done={!!done[p.id]}
+                onToggle={toggle}
+                open={rows?.openId === p.id}
+                onOpen={rows?.onOpen || (() => {})}
+                note={rows?.notes?.[p.id]}
+                onNote={rows?.onNote}
+                timer={rows?.timers && {
+                  elapsed: rows.timers.elapsed[p.id] || 0,
+                  clear: rows.timers.clear,
+                }}
+              />
             ))}
           </div>
 

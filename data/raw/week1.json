@@ -263,18 +263,6 @@
           ]
         },
         {
-          "id": "713",
-          "title": "Subarray Product Less Than K",
-          "cn": "乘积小于 K 的子数组",
-          "tier": "optional",
-          "est": 15,
-          "idea": "滑窗，每个右端点贡献 r-l+1 个子数组。",
-          "pitfall": "k<=1 要直接返回 0，否则 left 会越过 right 死循环；乘积用 long long 或先除后比。",
-          "variants": [
-            "改成用取对数+前缀和+二分"
-          ]
-        },
-        {
           "id": "1248",
           "title": "Count Number of Nice Subarrays",
           "cn": "统计优美子数组",
@@ -319,15 +307,52 @@
           "variants": []
         },
         {
-          "id": "31",
-          "title": "Next Permutation",
-          "cn": "下一个排列",
-          "tier": "optional",
-          "est": 15,
-          "idea": "从右找第一个 nums[i]<nums[i+1]，再从右找第一个大于它的交换，最后翻转后缀。",
-          "pitfall": "找不到 i（整个降序）时要整体翻转而不是返回；第二步找的是「从右往左第一个大于 nums[i] 的」，写成从左找会错。",
+          "id": "30",
+          "title": "Substring with Concatenation of All Words",
+          "cn": "串联所有单词的子串",
+          "tier": "core",
+          "est": 30,
+          "idea": "词长固定为 L，按 i%L 分组成 L 条独立的滑窗轨道，每条轨道上以「词」为单位滑动，用计数表维护窗口内各词的出现次数。",
+          "pitfall": "朴素做法是每个起点重扫一遍，O(n·m·L)；按余数分组后才是 O(n·L)。窗口内某词超量时要一路收缩到该词不再超量，而不是整体清空重来。",
           "variants": [
-            "写 prev_permutation 版本"
+            "words 允许重复时计数表的处理",
+            "改成 words 里词长不等——此时滑窗失效，需要 Trie/AC 自动机"
+          ]
+        },
+        {
+          "id": "2444",
+          "title": "Count Subarrays With Fixed Bounds",
+          "cn": "统计定界子数组的数目",
+          "tier": "core",
+          "est": 25,
+          "idea": "维护三个指针：最近一次越界位置 bad、最近一次出现 minK 的位置、最近一次出现 maxK 的位置。以 r 结尾的合法子数组数 = max(0, min(posMin,posMax) - bad)。",
+          "pitfall": "三个指针都要初始化成 -1 并且用同一套下标语义；min(posMin,posMax)-bad 可能为负，必须夹 0。这题不是传统的「双指针收缩」，硬套 while 收缩会写不出来。",
+          "variants": [
+            "改成求最长合法子数组"
+          ]
+        },
+        {
+          "id": "1499",
+          "title": "Max Value of Equation",
+          "cn": "满足不等式的最大值",
+          "tier": "optional",
+          "est": 25,
+          "idea": "把 yi+yj+|xi-xj| 在 i<j 下拆成 (yi-xi) + (yj+xj)，对固定的 j 要最大化窗口内的 yi-xi——单调队列维护窗口最大值。",
+          "pitfall": "窗口约束是 xj-xi<=k（按 x 的值而不是下标），弹出条件要写成比较 x 值。拆式子前必须先确定 i<j 时 |xi-xj| = xj-xi。",
+          "variants": [
+            "改成滑动窗口最大值的裸题对照写法"
+          ]
+        },
+        {
+          "id": "2953",
+          "title": "Count Complete Substrings",
+          "cn": "统计完全子字符串",
+          "tier": "optional",
+          "est": 30,
+          "idea": "先按「相邻字符差不超过 2」切成若干段，每段内枚举出现的不同字符数 k（1..26），窗口长度固定为 k*need，定长滑窗检查每个字符恰好出现 need 次。",
+          "pitfall": "两层限制容易只做一层。定长窗口配一个「恰好等于 need 的字符计数」可以 O(1) 判定，逐次重扫 26 个计数会退化。",
+          "variants": [
+            "去掉相邻差限制后的简化版"
           ]
         }
       ]
@@ -693,16 +718,6 @@
           ]
         },
         {
-          "id": "88",
-          "title": "Merge Sorted Array",
-          "cn": "合并两个有序数组",
-          "tier": "optional",
-          "est": 8,
-          "idea": "从后往前填，避免覆盖。",
-          "pitfall": "从前往后会覆盖 nums1 未处理的元素；循环结束后只需把 nums2 剩余部分搬完，nums1 剩余的天然就位。",
-          "variants": []
-        },
-        {
           "id": "912",
           "title": "Sort an Array",
           "cn": "排序数组",
@@ -748,6 +763,18 @@
           "pitfall": "交换用 while 而非 if（换过来的值还需继续归位）；交换前要判 nums[v-1] != v 否则相同值会无限循环；只处理 1<=v<=n 的值。",
           "variants": [
             "写标记负号的版本"
+          ]
+        },
+        {
+          "id": "2035",
+          "title": "Partition Array Into Two Arrays to Minimize Sum Difference",
+          "cn": "将数组分成两个数组并最小化数组和的差",
+          "tier": "optional",
+          "est": 35,
+          "idea": "折半枚举（meet in the middle）：左右各 n 个数，按「选了几个」分桶存子集和并排序，枚举左半选 k 个的每个和，在右半选 n-k 个的桶里二分找最接近的补值。",
+          "pitfall": "必须按选取个数分桶——两边选的个数加起来要正好是 n。二分找的是最接近 target 的值，要同时看 lower_bound 命中的位置和它前一个。",
+          "variants": [
+            "1755 Closest Subsequence Sum：同样的折半枚举，但不限制个数"
           ]
         }
       ]
@@ -855,28 +882,6 @@
           ]
         },
         {
-          "id": "304",
-          "title": "Range Sum Query 2D - Immutable",
-          "cn": "二维区域和检索",
-          "tier": "optional",
-          "est": 12,
-          "idea": "经典二维前缀和容斥。",
-          "pitfall": "前缀数组开 (m+1)x(n+1) 避免边界判断；容斥公式四项符号写错是最常见错误，建议画图核对一次。",
-          "variants": [
-            "扩展成二维差分"
-          ]
-        },
-        {
-          "id": "238",
-          "title": "Product of Array Except Self",
-          "cn": "除自身以外数组的乘积",
-          "tier": "optional",
-          "est": 12,
-          "idea": "两遍扫描，前缀积和后缀积相乘，可复用输出数组做 O(1) 额外空间。",
-          "pitfall": "不能用总积除以自身（有 0）；第二遍要用一个滚动变量而非再开数组才算 O(1)。",
-          "variants": []
-        },
-        {
           "id": "918",
           "title": "Maximum Sum Circular Subarray",
           "cn": "环形子数组的最大和",
@@ -886,6 +891,54 @@
           "pitfall": "全为负数时「总和-最小」会得到 0（空数组），必须特判直接返回普通最大值。",
           "variants": [
             "用前缀和+单调队列的滑窗写法"
+          ]
+        },
+        {
+          "id": "363",
+          "title": "Max Sum of Rectangle No Larger Than K",
+          "cn": "矩形区域不超过 K 的最大数值和",
+          "tier": "core",
+          "est": 35,
+          "idea": "枚举上下边界把二维压成一维，问题变成「和不超过 K 的最大子数组和」：前缀和边扫边用有序集合二分找 lower_bound(pre - K)。",
+          "pitfall": "有序集合里要先塞 0 代表空前缀。找的是最小的满足 pre_j >= pre_i - K 的 pre_j，方向写反就变成求最小和了。行远多于列时应转置后再枚举，否则复杂度差一个数量级。",
+          "variants": [
+            "去掉 K 限制退化成 Kadane 的二维版"
+          ]
+        },
+        {
+          "id": "2488",
+          "title": "Count Subarrays With Median K",
+          "cn": "统计中位数为 K 的子数组",
+          "tier": "core",
+          "est": 25,
+          "idea": "把大于 k 的记 +1、小于记 -1、等于记 0，则合法子数组必须包含 k 的位置且平衡值为 0（偶数长度时为 1）。从 k 的位置向两边分别统计平衡值出现次数，再配对。",
+          "pitfall": "偶数长度取左中位数这个定义决定了要同时统计 0 和 1 两个目标值。子数组必须跨过 k 所在下标——两侧独立统计再相乘配对，不能整体做前缀和哈希。",
+          "variants": [
+            "改成中位数 >= k 的计数"
+          ]
+        },
+        {
+          "id": "2681",
+          "title": "Power of Heroes",
+          "cn": "英雄的力量",
+          "tier": "optional",
+          "est": 30,
+          "idea": "排序后固定最大值 nums[i]，所有子集的最小值贡献可以推成前缀递推：f[i] = 2*f[i-1] + nums[i]，答案累加 nums[i]^2 * f[i]。",
+          "pitfall": "关键是发现「子集只由最大值和最小值决定」，中间元素选不选只贡献 2 的幂次。取模要在每一步做，nums[i]^2 会溢出 int。",
+          "variants": [
+            "改成求所有子集 max-min 之和"
+          ]
+        },
+        {
+          "id": "1521",
+          "title": "Find a Value of a Mysterious Function Closest to Target",
+          "cn": "找到最接近目标值的函数值",
+          "tier": "optional",
+          "est": 30,
+          "idea": "以每个 r 为右端点，所有 AND 值的集合大小是 O(log V)——因为向左扩展时 AND 只会单调减少且每次至少灭掉一个二进制位。用一个集合逐位递推。",
+          "pitfall": "容易上来就写线段树 + 二分（也能过但更重）。核心观察是「不同的 AND 取值只有 30 个左右」，集合每轮重建而不是累加，否则会退化成 O(n^2)。",
+          "variants": [
+            "把 AND 换成 OR / GCD——同样的按位收敛性质"
           ]
         }
       ]

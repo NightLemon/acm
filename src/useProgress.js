@@ -37,7 +37,19 @@ export function useProgress() {
   }, []);
 
   const reset = useCallback(() => {
-    if (confirm('清空所有进度？此操作不可撤销。')) setDone({});
+    if (!confirm('清空所有进度、笔记和计时？此操作不可撤销。')) return;
+    // Write straight to storage rather than going through setState — the
+    // persist effect wouldn't get a chance to run before the reload below.
+    // Notes and timers are keyed the same way and are meaningless without the
+    // progress they annotate, so they go too.
+    try {
+      localStorage.removeItem(KEY);
+      localStorage.removeItem('acm-prep-notes-v1');
+      localStorage.removeItem('acm-prep-timers-v1');
+    } catch { /* ignore */ }
+    // Those live in sibling hooks with their own state; reloading is the
+    // simplest way to get every consumer back in sync.
+    location.reload();
   }, []);
 
   return { done, toggle, reset };

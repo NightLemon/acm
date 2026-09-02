@@ -2,12 +2,12 @@ import { useState, useMemo } from 'react';
 import { ProblemRow } from './ui.jsx';
 
 const WEEK_META = {
-  1: { name: '基础与手感', desc: '双指针、二分、单调栈、堆、滑动窗口。难度不高，重点是把常用 STL / Python API 和边界处理写熟。建议每题都动手实现。' },
+  1: { name: '基础与手感', desc: '双指针、二分、单调栈、堆、滑动窗口。重点是把常用 STL / Python API 和边界处理写熟——核心题里有相当一部分是 Hard，别被「基础」两个字骗了。建议每题都动手实现。' },
   2: { name: '动态规划与图论', desc: '线性 / 区间 / 状压 / 数位 / 树形 DP，最短路、生成树、拓扑排序、并查集，以及二叉树与 Trie。' },
   3: { name: '高级数据结构与算法', desc: '树状数组、线段树（含 lazy 双标记）、KMP / Z 函数 / 字符串哈希、Manacher、数论与组合计数，以及表达式解析类综合题。' },
 };
 
-export function AlgoView({ days, week, done, toggle }) {
+export function AlgoView({ days, week, done, toggle, rows }) {
   const weekDays = useMemo(() => days.filter((d) => d.week === week), [days, week]);
   const [activeDay, setActiveDay] = useState(null);
   const [tier, setTier] = useState('all');
@@ -32,6 +32,22 @@ export function AlgoView({ days, week, done, toggle }) {
   const all = weekDays.flatMap((d) => d.problems);
   const doneCount = all.filter((p) => done[p.id]).length;
   const meta = WEEK_META[week];
+
+  // Open the next unsolved problem in reading order, honouring the current
+  // filters — so with 核心 selected it walks the core track only.
+  const nextUnsolved = () => {
+    const pool = shown.flatMap((d) => filter(d.problems));
+    const i = pool.findIndex((p) => p.id === rows?.openId);
+    const target = pool.slice(i + 1).find((p) => !done[p.id]) || pool.find((p) => !done[p.id]);
+    if (!target) return;
+    rows?.onOpen(target.id, true);
+    // Let the row render before scrolling to it.
+    requestAnimationFrame(() => {
+      document.getElementById(`p-${target.id}`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  };
+  const remaining = all.length - doneCount;
 
   return (
     <>
@@ -74,6 +90,9 @@ export function AlgoView({ days, week, done, toggle }) {
         <button className={`fbtn${diff === 'Hard' ? ' on' : ''}`} onClick={() => setDiff('Hard')}>Hard</button>
         <span style={{ width: 8 }} />
         <button className={`fbtn${hideDone ? ' on' : ''}`} onClick={() => setHideDone((h) => !h)}>隐藏已完成</button>
+        <button className="fbtn go" onClick={nextUnsolved} disabled={!remaining} title="按当前筛选跳到下一道没做的题">
+          ↓ 下一道未完成
+        </button>
         <span className="fspacer" />
         <input className="fsearch" placeholder="搜索题号 / 标题 / 标签" value={q} onChange={(e) => setQ(e.target.value)} />
       </div>
@@ -100,7 +119,20 @@ export function AlgoView({ days, week, done, toggle }) {
             </div>
             <div className="plist">
               {ps.map((p) => (
-                <ProblemRow key={p.id} p={p} done={!!done[p.id]} onToggle={toggle} />
+                <ProblemRow
+                  key={p.id}
+                  p={p}
+                  done={!!done[p.id]}
+                  onToggle={toggle}
+                  open={rows?.openId === p.id}
+                  onOpen={rows?.onOpen || (() => {})}
+                  note={rows?.notes?.[p.id]}
+                  onNote={rows?.onNote}
+                  timer={rows?.timers && {
+                    elapsed: rows.timers.elapsed[p.id] || 0,
+                    clear: rows.timers.clear,
+                  }}
+                />
               ))}
             </div>
           </div>
