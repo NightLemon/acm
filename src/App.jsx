@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { lazy, Suspense, useState, useMemo, useEffect, useCallback } from 'react';
 import curriculum from '../data/curriculum.json';
 import { useProgress } from './useProgress.js';
 import { useOfflineSync } from './useOfflineSync.js';
@@ -10,17 +10,25 @@ import { MockView } from './components/MockView.jsx';
 import { DesignView } from './components/DesignView.jsx';
 import { FundamentalsView } from './components/FundamentalsView.jsx';
 
+const CodeChatView = lazy(() => import('./components/CodeChatView.jsx').then((module) => ({
+  default: module.CodeChatView,
+})));
+
 const NAV = [
   { key: 'w1', label: 'Week 1 · 基础与手感', sub: 'Day 1–7' },
   { key: 'w2', label: 'Week 2 · DP 与图论', sub: 'Day 8–14' },
   { key: 'w3', label: 'Week 3 · 高级数据结构', sub: 'Day 15–21' },
   { key: 'w4', label: 'Week 4 · 综合训练', sub: 'Day 22–28' },
+  { key: 'code', label: '描述实现', sub: 'Code + LLM' },
   { key: 'design', label: '系统设计', sub: '框架 + 案例' },
   { key: 'fund', label: '语言细节', sub: '速查附录' },
 ];
 
 export default function App() {
   const [view, setView] = useState('w1');
+  const [codeProblemId, setCodeProblemId] = useState(null);
+  const [codePanelOpen, setCodePanelOpen] = useState(false);
+  const [codePanelCollapsed, setCodePanelCollapsed] = useState(false);
   // On phones the sidebar is an off-canvas drawer; on desktop it's always visible
   // and this flag is ignored by CSS.
   const [navOpen, setNavOpen] = useState(false);
@@ -41,6 +49,22 @@ export default function App() {
     for (const d of mock?.days || []) for (const p of d.problems || []) s.add(p.id);
     return [...s];
   }, [algoDays, mock]);
+
+  const problemMeta = useMemo(() => {
+    if (!codeProblemId) return null;
+    const problems = [
+      ...algoDays.flatMap((day) => day.problems || []),
+      ...(mock?.days || []).flatMap((day) => day.problems || []),
+    ];
+    const problem = problems.find((item) => item.id === codeProblemId);
+    return problem ? {
+      id: problem.id,
+      title: problem.title,
+      cn: problem.cn,
+      url: problem.url,
+      urlEn: problem.urlEn,
+    } : null;
+  }, [algoDays, mock, codeProblemId]);
 
   const doneCount = allIds.filter((id) => done[id]).length;
   const pct = allIds.length ? (doneCount / allIds.length) * 100 : 0;
@@ -83,11 +107,27 @@ export default function App() {
     notes,
     onNote: setNote,
     timers,
+    onDescribe: (id) => {
+      setCodeProblemId(id);
+      setCodePanelOpen(true);
+      setCodePanelCollapsed(false);
+      setNavOpen(false);
+    },
   };
 
-  const go = (key) => { setView(key); setNavOpen(false); };
+  const go = (key) => {
+    if (key === 'code') {
+      setCodeProblemId(null);
+      setCodePanelOpen(true);
+      setCodePanelCollapsed(false);
+      setNavOpen(false);
+      return;
+    }
+    setView(key);
+    setNavOpen(false);
+  };
   return (
-    <div className={`app${navOpen ? ' nav-open' : ''}`}>
+    <div className={`app${navOpen ? ' nav-open' : ''}${codePanelOpen ? ' code-panel-open' : ''}${codePanelCollapsed ? ' code-panel-collapsed' : ''}`}>
       {/* Mobile-only bar. Hidden at desktop widths via CSS. */}
       <header className="topbar">
         <button className="hamburger" onClick={() => setNavOpen(true)} aria-label="打开目录">
@@ -121,7 +161,7 @@ export default function App() {
               return (
                 <button
                   key={n.key}
-                  className={`nav-item${view === n.key ? ' active' : ''}`}
+                  className={`nav-item${n.key === 'code' ? (codePanelOpen ? ' active' : '') : (view === n.key ? ' active' : '')}`}
                   onClick={() => go(n.key)}
                   title={n.label}
                 >
@@ -167,6 +207,51 @@ export default function App() {
           {view === 'fund' && <FundamentalsView fundamentals={fundamentals} handwritten={handwritten} />}
         </div>
       </main>
+
+      {codePanelOpen && (
+        <aside className={`code-drawer${codePanelCollapsed ? ' collapsed' : ''}`} aria-label="代码生成工作区">
+          <button
+            className="code-drawer-expand"
+            type="button"
+            onClick={() => setCodePanelCollapsed(false)}
+            aria-label="展开代码生成工作区"
+            title="展开代码生成工作区"
+          >
+            <span>‹</span>
+            <b>{problemMeta ? `#${problemMeta.id}` : '代码生成'}</b>
+          </button>
+          <header className="code-drawer-head">
+            <button
+              className="code-drawer-icon"
+              type="button"
+              onClick={() => setCodePanelCollapsed(true)}
+              aria-label="收起代码生成工作区"
+              title="收起"
+            >›</button>
+            <div className="code-drawer-title">
+              <b>{problemMeta ? `#${problemMeta.id} · ${problemMeta.cn || problemMeta.title}` : '独立代码生成'}</b>
+              <span>描述逻辑 → 校验 → 生成</span>
+            </div>
+            {problemMeta?.url && (
+              <a className="code-submit-link" href={problemMeta.url} target="_blank" rel="noreferrer">
+                打开力扣提交 ↗
+              </a>
+            )}
+            <button
+              className="code-drawer-icon close"
+              type="button"
+              onClick={() => setCodePanelOpen(false)}
+              aria-label="关闭代码生成工作区"
+              title="关闭"
+            >×</button>
+          </header>
+          <div className="code-drawer-body">
+            <Suspense fallback={<div className="empty">正在加载代码编辑器…</div>}>
+              <CodeChatView key={problemMeta?.id || 'standalone'} problemMeta={problemMeta} embedded />
+            </Suspense>
+          </div>
+        </aside>
+      )}
     </div>
   );
 }

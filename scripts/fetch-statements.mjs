@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = join(ROOT, 'public/statements');
+const TEMPLATES_FILE = join(ROOT, 'data/code-templates.json');
 const EN = 'https://leetcode.com/graphql';
 const CN = 'https://leetcode.cn/graphql';
 
@@ -54,6 +55,7 @@ async function gql(url, query, variables, attempt = 0, maxAttempts = 4) {
 const Q_EN = `query q($slug: String!) {
   question(titleSlug: $slug) {
     questionFrontendId title titleSlug difficulty content hints sampleTestCase
+    codeSnippets { langSlug code }
     topicTags { name }
   }
 }`;
@@ -76,9 +78,14 @@ async function main() {
   const have = new Set(
     existsSync(OUT) ? readdirSync(OUT).filter((f) => f.endsWith('.json')).map((f) => f.slice(0, -5)) : []
   );
+  let templates = {};
+  if (existsSync(TEMPLATES_FILE)) {
+    try { templates = JSON.parse(readFileSync(TEMPLATES_FILE, 'utf8')); }
+    catch { console.log('  (invalid code-templates.json — rebuilding it)'); }
+  }
 
-  const todo = [...ids].filter((id) => FORCE || !have.has(id));
-  console.log(`statements: ${ids.size} referenced, ${have.size} cached, ${todo.length} to fetch`);
+  const todo = [...ids].filter((id) => FORCE || !have.has(id) || !templates[id]);
+  console.log(`statements: ${ids.size} referenced, ${have.size} cached, ${Object.keys(templates).length} templates, ${todo.length} to fetch`);
 
   let ok = 0;
   let cnOk = 0, cnFail = 0, skipCn = false;
@@ -88,16 +95,25 @@ async function main() {
     const id = todo[i];
     const meta = index[id];
     if (!meta) { failed.push(`${id} (not in index)`); continue; }
+    const needsStatement = FORCE || !have.has(id);
 
     try {
       const en = await gql(EN, Q_EN, { slug: meta.slug });
       const q = en?.question;
       if (!q?.content) throw new Error('empty content');
 
+      const snippets = Object.fromEntries(
+        (q.codeSnippets || []).map((snippet) => [snippet.langSlug, snippet.code])
+      );
+      templates[id] = {
+        cpp: snippets.cpp || null,
+        python: snippets.python3 || snippets.python || null,
+      };
+
       // Chinese translation is best-effort: leetcode.cn sits behind a WAF that
       // usually rejects us, so try once and move on rather than burning retries.
       let cn = null, cnTitle = null;
-      if (!skipCn) {
+      if (needsStatement && !skipCn) {
         try {
           const r = await gql(CN, Q_CN, { slug: meta.slug }, 0, 0);
           cn = sanitize(r?.question?.translatedContent);
@@ -113,24 +129,27 @@ async function main() {
         }
       }
 
-      writeFileSync(
-        join(OUT, `${id}.json`),
-        JSON.stringify({
-          id,
-          slug: meta.slug,
-          title: q.title,
-          titleCn: cnTitle,
-          difficulty: q.difficulty,
-          tags: (q.topicTags || []).map((t) => t.name),
-          content: sanitize(q.content),
-          contentCn: cn,
-          hints: q.hints || [],
-          sampleTestCase: q.sampleTestCase || null,
-        })
-      );
+      if (needsStatement) {
+        writeFileSync(
+          join(OUT, `${id}.json`),
+          JSON.stringify({
+            id,
+            slug: meta.slug,
+            title: q.title,
+            titleCn: cnTitle,
+            difficulty: q.difficulty,
+            tags: (q.topicTags || []).map((t) => t.name),
+            content: sanitize(q.content),
+            contentCn: cn,
+            hints: q.hints || [],
+            sampleTestCase: q.sampleTestCase || null,
+          })
+        );
+      }
       ok++;
-      const cnMark = cn ? 'cn' : '--';
-      console.log(`  [${i + 1}/${todo.length}] ${id} ${q.title} (${cnMark})`);
+      const templateMark = templates[id].cpp && templates[id].python ? 'C++/Py' : 'partial';
+      const cnMark = needsStatement ? (cn ? 'cn' : '--') : 'cached';
+      console.log(`  [${i + 1}/${todo.length}] ${id} ${q.title} (${cnMark}, ${templateMark})`);
     } catch (e) {
       failed.push(`${id} ${meta.slug}: ${e.message}`);
       console.log(`  [${i + 1}/${todo.length}] ${id} FAILED: ${e.message}`);
@@ -144,8 +163,10 @@ async function main() {
     join(OUT, 'manifest.json'),
     JSON.stringify({ ids: all.map((f) => f.slice(0, -5)).sort() })
   );
+  writeFileSync(TEMPLATES_FILE, JSON.stringify(templates));
 
   console.log(`\n✓ fetched ${ok}, total on disk ${all.length}/${ids.size}`);
+  console.log(`✓ code templates ${Object.keys(templates).length}/${ids.size}`);
   if (failed.length) {
     console.log(`✗ ${failed.length} failed:`);
     for (const f of failed) console.log('   ' + f);

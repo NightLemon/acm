@@ -85,6 +85,7 @@ export function MockView({ mock, done, toggle, rows }) {
                 onOpen={rows?.onOpen || (() => {})}
                 note={rows?.notes?.[p.id]}
                 onNote={rows?.onNote}
+                onDescribe={rows?.onDescribe}
                 timer={rows?.timers && {
                   elapsed: rows.timers.elapsed[p.id] || 0,
                   clear: rows.timers.clear,

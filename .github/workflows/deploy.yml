@@ -32,6 +32,8 @@ jobs:
       # instead of shipping.
       - run: npm run rebuild
 
+      - run: npm test
+
       - run: npm run icons
 
       # base must match the repo name for a project Pages site.

@@ -74,7 +74,7 @@ function Statement({ id }) {
 // and 35 on a Hard is longer than anyone wants to be stuck without a nudge.
 const gateSeconds = (p) => Math.min(15, Math.max(5, Math.round((p.est || 20) * 0.6))) * 60;
 
-export function ProblemRow({ p, done, onToggle, open, onOpen, timer, note, onNote }) {
+export function ProblemRow({ p, done, onToggle, open, onOpen, timer, note, onNote, onDescribe }) {
   const [draft, setDraft] = useState(note || '');
   const spent = timer?.elapsed || 0;
   const need = gateSeconds(p);
@@ -163,6 +163,9 @@ export function ProblemRow({ p, done, onToggle, open, onOpen, timer, note, onNot
             </div>
           )}
           <div className="plinks">
+            {onDescribe && (
+              <button className="plink describe" onClick={() => onDescribe(p.id)}>描述逻辑并生成代码 →</button>
+            )}
             <a className="plink" href={p.url} target="_blank" rel="noreferrer">力扣 · 提交 / 题解 ↗</a>
             <a className="plink" href={p.urlEn} target="_blank" rel="noreferrer">LeetCode ↗</a>
             {spent > 0 && (
