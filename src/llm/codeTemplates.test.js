@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import codeTemplates from '../../data/code-templates.json';
-import { detectTargetFunction } from './codeAnonymizer.js';
+import { detectTargetFunction, detectTargetInterface } from './codeAnonymizer.js';
 
 describe('official code templates', () => {
   it('包含课程题目的 C++ 与 Python 模板', () => {
@@ -24,6 +24,14 @@ describe('official code templates', () => {
     expect(detectTargetFunction(codeTemplates['33'].cpp, 'cpp')).toMatchObject({
       ok: true,
       targetName: 'search',
+    });
+  });
+
+  it('第 146 题多方法设计模板可脱敏', () => {
+    expect(detectTargetInterface(codeTemplates['146'].cpp, 'cpp')).toMatchObject({
+      ok: true,
+      kind: 'design-class',
+      className: 'LRUCache',
     });
   });
 });

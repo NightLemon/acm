@@ -33,6 +33,31 @@ describe('prompt request allowlist', () => {
     expect(serialized).toContain('__TARGET_FUNCTION__');
     expect(serialized).toContain('在 __TARGET_FUNCTION__ 中返回 x');
   });
+
+  it.each([buildValidationMessages, buildGenerationMessages])('设计类隐藏类名和所有方法名', (builder) => {
+    const serialized = JSON.stringify(builder({
+      language: 'cpp',
+      maskedSource: 'class __TARGET_CLASS__ { public: __TARGET_CLASS__(int capacity); int __TARGET_METHOD_1__(int key); void __TARGET_METHOD_2__(int key, int value); };',
+      mappings: [
+        { name: 'LRUCache', placeholder: '__TARGET_CLASS__', kind: 'class' },
+        { name: 'get', placeholder: '__TARGET_METHOD_1__', kind: 'method' },
+        { name: 'put', placeholder: '__TARGET_METHOD_2__', kind: 'method' },
+      ],
+      interfaceKind: 'design-class',
+      signatures: [
+        '__TARGET_CLASS__(int capacity)',
+        'int __TARGET_METHOD_1__(int key)',
+        'void __TARGET_METHOD_2__(int key, int value)',
+      ],
+      conversation: [{ role: 'user', kind: 'description', content: 'LRUCache 的 get 和 put 都按我描述的链表规则实现。' }],
+    }));
+
+    expect(serialized).not.toContain('LRUCache');
+    expect(serialized).not.toMatch(/\bget\b|\bput\b/);
+    expect(serialized).toContain('__TARGET_CLASS__');
+    expect(serialized).toContain('__TARGET_METHOD_1__');
+    expect(serialized).toContain('__TARGET_METHOD_2__');
+  });
 });
 
 describe('strict response parsing', () => {
@@ -54,6 +79,15 @@ describe('strict response parsing', () => {
     expect(parseGeneratedResponse('class Solution { int __TARGET_FUNCTION__(); };').status).toBe('generated');
     expect(() => parseGeneratedResponse('```cpp\nint __TARGET_FUNCTION__();\n```')).toThrow();
     expect(() => parseGeneratedResponse('int anotherFunction();')).toThrow();
+  });
+
+  it('设计类生成结果必须保留全部接口占位符', () => {
+    const placeholders = ['__TARGET_CLASS__', '__TARGET_METHOD_1__', '__TARGET_METHOD_2__'];
+    const complete = 'class __TARGET_CLASS__ { __TARGET_CLASS__(int n); int __TARGET_METHOD_1__(int k); void __TARGET_METHOD_2__(int k, int v); };';
+    const missingPut = 'class __TARGET_CLASS__ { __TARGET_CLASS__(int n); int __TARGET_METHOD_1__(int k); };';
+
+    expect(parseGeneratedResponse(complete, placeholders).status).toBe('generated');
+    expect(() => parseGeneratedResponse(missingPut, placeholders)).toThrow('__TARGET_METHOD_2__');
   });
 
   it('生成阶段可退回澄清而不生成代码', () => {

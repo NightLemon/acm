@@ -3,10 +3,10 @@ import codeTemplates from '../../data/code-templates.json';
 import { CodeEditor } from './CodeEditor.jsx';
 import { emptyCodeSession, useCodeSession } from '../useCodeSessions.js';
 import {
-  detectTargetFunction,
-  isConfirmedTargetUnchanged,
-  replaceIdentifier,
-  restoreIdentifier,
+  detectTargetInterface,
+  isTargetInterfaceUnchanged,
+  maskTargetInterface,
+  restoreTargetInterface,
 } from '../llm/codeAnonymizer.js';
 import {
   buildGenerationMessages,
@@ -75,7 +75,7 @@ export function CodeChatView({ problemMeta, embedded = false }) {
   const currentTemplate = problemTemplates?.[session.language] || '';
 
   const detection = useMemo(
-    () => detectTargetFunction(session.source, session.language),
+    () => detectTargetInterface(session.source, session.language),
     [session.source, session.language]
   );
 
@@ -198,14 +198,14 @@ export function CodeChatView({ problemMeta, embedded = false }) {
       createdAt: Date.now(),
     };
     const conversation = [...session.messages, userMessage];
-    const targetName = detection.targetName;
-    const confirmedSignature = detection.signature;
-    const maskedSource = replaceIdentifier(session.source, targetName);
+    const maskedSource = maskTargetInterface(session.source, detection.mappings);
     const requestData = {
       language: session.language,
       maskedSource,
       conversation,
-      targetName,
+      mappings: detection.mappings,
+      interfaceKind: detection.kind,
+      signatures: detection.signatures,
     };
     const controller = new AbortController();
     abortRef.current = controller;
@@ -234,21 +234,20 @@ export function CodeChatView({ problemMeta, embedded = false }) {
           signal: controller.signal,
         }
       );
-      const generated = parseGeneratedResponse(generatedText);
+      const generated = parseGeneratedResponse(generatedText, detection.placeholders);
       if (generated.status === 'needs_clarification') {
         addAssistant(generated.questions.join('\n'), 'clarification');
         return;
       }
 
-      if (replaceIdentifier(generated.code, targetName) !== generated.code) {
-        throw new Error('模型猜测并输出了真实函数名，结果已拒绝，编辑器未修改。');
+      if (maskTargetInterface(generated.code, detection.mappings) !== generated.code) {
+        throw new Error('模型猜测并输出了真实接口名，结果已拒绝，编辑器未修改。');
       }
-      const restoredCode = restoreIdentifier(generated.code, targetName);
-      if (!isConfirmedTargetUnchanged(
+      const restoredCode = restoreTargetInterface(generated.code, detection.mappings);
+      if (!isTargetInterfaceUnchanged(
         restoredCode,
         session.language,
-        targetName,
-        confirmedSignature
+        detection
       )) {
         throw new Error('生成结果修改或丢失了原目标接口，编辑器未修改。');
       }
@@ -374,8 +373,9 @@ export function CodeChatView({ problemMeta, embedded = false }) {
         <div className={`mask-auto${detection.ok ? '' : ' invalid'}`}>
           {detection.ok ? (
             <>
-              <span>发送时自动隐藏函数名</span>
-              <code>{detection.targetName}</code><span>→</span><code>__TARGET_FUNCTION__</code>
+              <span>发送时自动隐藏{detection.kind === 'design-class' ? '类名与方法名' : '函数名'}</span>
+              <code>{detection.mappings.map((mapping) => mapping.name).join('、')}</code>
+              <span>→ {detection.mappings.length} 个占位符</span>
             </>
           ) : <span>{detection.error}</span>}
         </div>
@@ -472,7 +472,9 @@ export function CodeChatView({ problemMeta, embedded = false }) {
             placeholder="按实现顺序描述数据结构、循环、分支、边界处理和返回规则。不要只写算法名称。Enter 发送，Shift+Enter 换行。"
           />
           <div className="composer-actions">
-            <span>{detection.ok ? `发送时自动隐藏 ${detection.targetName}` : '发送前会自动检查目标函数'}</span>
+            <span>{detection.ok
+              ? `已识别${detection.kind === 'design-class' ? `${detection.mappings.length - 1} 个 public 方法` : '目标函数'}，发送时自动脱敏`
+              : '发送前会自动检查类接口'}</span>
             {busy
               ? <button className="code-send cancel" type="button" onClick={cancel}>取消</button>
               : <button className="code-send" type="submit" disabled={!draft.trim()}>校验并生成</button>}
