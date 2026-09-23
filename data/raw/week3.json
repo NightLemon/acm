@@ -796,6 +796,222 @@
           ]
         }
       ]
+    },
+    {
+      "day": 29,
+      "title": "现代 C++17 实战 · Hard 题组",
+      "focus": "用 16 道 Hard 题把 C++17 放进真实算法实现：structured bindings、if 初始化语句、generic lambda、string_view、from_chars、optional、variant/visit、CTAD、try_emplace、node handle、unique_ptr/RAII 与稳定迭代器。每题先完成正确实现，再做现代化重构并复盘所有权、view 生命周期、迭代器失效和拷贝成本；统一按 -std=c++17 编译，禁止裸 new/delete。并行算法与 fold expression 在这些判题接口里没有自然收益，不为覆盖清单而硬塞。",
+      "drill": "每题做两遍：第一遍先写清楚、正确的 C++17 解法；第二遍再做一次现代化重构，并回答四个问题：哪些对象拥有内存、哪些 string_view 只是借用、哪些操作会让迭代器或引用失效、使用新 API 是否真的减少拷贝或分支。统一按 -std=c++17 编译，禁止裸 new/delete；遇到 pmr 或 node handle 时额外写一个最小生命周期测试。",
+      "problems": [
+        {
+          "id": "37",
+          "title": "Sudoku Solver",
+          "cn": "解数独",
+          "tier": "core",
+          "est": 55,
+          "idea": "用三个 std::array<uint16_t, 9> 维护行、列、宫的占用位，并用 MRV 每次选择候选最少的空格。递归写成 auto dfs = [&](auto&& self) -> bool 的 generic lambda；用 std::optional<pair<int,int>> 表示尚未找到或已经选中的格子，找到完整解时返回 true。",
+          "pitfall": "试数分支失败时必须同时恢复棋盘和三组位掩码，任一处漏回滚都会产生幽灵约束；找到完整解的成功分支则必须保留填数。若使用 RAII 回滚守卫，成功返回前要显式 commit/dismiss。optional 里只保存坐标值，不要保存指向临时对象的引用。",
+          "variants": [
+            "C++17 复习：std::array、std::optional、generic lambda 与支持 commit/dismiss 的 RAII 回滚守卫",
+            "进阶：实现候选格 MRV，并比较它与固定顺序 DFS 的搜索节点数"
+          ]
+        },
+        {
+          "id": "65",
+          "title": "Valid Number",
+          "cn": "有效数字",
+          "tier": "core",
+          "est": 35,
+          "idea": "把输入包装成 std::string_view，用游标扫描 sign、digits、dot、exponent 四段，全程不产生 substring。让 scanDigits 返回 std::optional<size_t> 或消费后的新位置，并用 if (auto next = scanDigits(...); next) 组合语法规则。",
+          "pitfall": "指数 e/E 的前后规则不同：指数后必须有整数数字；小数点两侧只需至少一侧有数字。string_view 不拥有内存，不能从临时 string 构造后跨语句保存；C++17 也没有 starts_with，不要误用 C++20 API。",
+          "variants": [
+            "C++17 复习：std::string_view、std::optional、if 初始化语句与 enum class 状态",
+            "扩展：让同一词法器返回错误位置和错误类型，而不只返回 bool"
+          ]
+        },
+        {
+          "id": "140",
+          "title": "Word Break II",
+          "cn": "单词拆分 II",
+          "tier": "optional",
+          "est": 55,
+          "idea": "以起始下标为状态做记忆化 DFS，递归使用 generic lambda；先用 wordDict 中稳定的 string 构建 unordered_set<string_view>，再用指向原字符串的 view 切片查词，只有形成最终句子时才构造拥有内存的 string。可把临时拼接实验性地放进 pmr::monotonic_buffer_resource，返回前复制到普通 vector<string>。",
+          "pitfall": "C++17 的 unordered_set<string> 不能直接用 string_view 做异构 find；借用型 unordered_set<string_view> 要求整个搜索期间不修改或搬动 wordDict，原字符串也必须保持存活。pmr 容器一旦越过 resource 生命周期就全部悬空，所以 LeetCode 返回值必须是普通拥有型容器。",
+          "variants": [
+            "C++17 复习：string_view、generic lambda、pmr::monotonic_buffer_resource 的所有权边界",
+            "对比按字符串记忆化与按下标记忆化的分配次数"
+          ]
+        },
+        {
+          "id": "224",
+          "title": "Basic Calculator",
+          "cn": "基本计算器",
+          "tier": "core",
+          "est": 45,
+          "idea": "先用 string_view + from_chars 做零拷贝 tokenizer，把 token 建模为 variant<long long, char>，再用栈或递归下降处理加减与括号。通过 get_if 或 visit 区分数字和符号，避免用魔法整数编码 token 类型。",
+          "pitfall": "from_chars 不会跳过空格，且必须检查返回指针和 errc；一元正负号可能出现在开头或左括号后。variant 的每个分支都要覆盖，不能在未确认类型时直接 get 导致 bad_variant_access。",
+          "variants": [
+            "C++17 复习：std::variant、std::visit、std::from_chars 与 string_view",
+            "扩展成带乘除和变量的递归下降解析器，并保持 token 层不分配"
+          ]
+        },
+        {
+          "id": "282",
+          "title": "Expression Add Operators",
+          "cn": "给表达式添加运算符",
+          "tier": "core",
+          "est": 60,
+          "idea": "递归枚举下一个数字段与运算符，数字段用 string_view + from_chars 解析；维护当前值和上一乘法项以实现乘法优先级。表达式只用一个 string 缓冲区，进入分支前记住 size，回溯时 resize，避免每层复制。",
+          "pitfall": "多位数不能有前导零；乘法转移应为 value - last + last * current。from_chars 的结果和 long long 溢出都要检查，string 缓冲区扩容会让指向其内部的 view/指针失效，所以 view 只能引用原始 num。",
+          "variants": [
+            "C++17 复习：from_chars、string_view、generic lambda 与可变缓冲区的失效规则",
+            "扩展：加入除法并明确定义整除、负数和溢出语义"
+          ]
+        },
+        {
+          "id": "352",
+          "title": "Data Stream as Disjoint Intervals",
+          "cn": "将数据流变为多个不相交区间",
+          "tier": "core",
+          "est": 45,
+          "idea": "用 map<int,int> 保存 start -> end。插入值时 lower_bound 找右邻居，再判断是否连接左邻居；若只与右侧相连，可 extract 右节点、修改 node_handle.key() 后重新插入，双侧相连则扩展左端并删除右端。",
+          "pitfall": "extract 后原迭代器立即失效，必须使用 insert 返回的新迭代器；node handle 为空时不能访问 key/mapped。比较 value±1 时要防 int 边界溢出，最好提升为 long long 再判断相邻。",
+          "variants": [
+            "C++17 复习：map::extract/node_type、if 初始化语句和迭代器失效边界",
+            "对比普通 erase+emplace 与 node handle 改 key 的对象移动次数"
+          ]
+        },
+        {
+          "id": "381",
+          "title": "Insert Delete GetRandom O(1) - Duplicates allowed",
+          "cn": "O(1) 时间插入、删除和获取随机元素（允许重复）",
+          "tier": "optional",
+          "est": 50,
+          "idea": "用 vector<int> 存所有实例，用 unordered_map<int, unordered_set<size_t>> 存每个值的下标集合。insert 用 try_emplace；remove 通过 if 初始化语句取得集合迭代器，把末尾元素搬到被删位置并同步两边索引。随机数用 mt19937 + uniform_int_distribution。",
+          "pitfall": "当删除值正好等于 vector 末尾值时，先删哪个索引会决定是否把已删除位置重新插回；要画出同值和异值两种顺序。unordered_map rehash 会使迭代器失效，但不会使元素引用或指针失效；erase 才会让被删元素的引用失效，因此不要让迭代器跨过 try_emplace/erase。",
+          "variants": [
+            "C++17 复习：try_emplace、structured bindings、if 初始化语句与随机数设施",
+            "扩展：支持按权重 getRandom，并说明 O(1) 目标为何需要改变"
+          ]
+        },
+        {
+          "id": "407",
+          "title": "Trapping Rain Water II",
+          "cn": "接雨水 II",
+          "tier": "core",
+          "est": 50,
+          "idea": "从四周边界做最小堆扩张，堆元素用 tuple<int,int,int> 表示有效水位和坐标；用 structured binding 解包，方向用 constexpr array。可以用 C++17 CTAD 构造 priority_queue 的比较器和底层 vector，让类型仍集中在 Cell 别名中。",
+          "pitfall": "格子必须在入堆时标记 visited，否则会被多个方向重复入堆。推邻居时新水位是 max(currentLevel, height[nr][nc])，本次积水是 max(0, currentLevel-height[nr][nc])；边界行列为 1 时不要重复初始化。",
+          "variants": [
+            "C++17 复习：tuple structured bindings、CTAD、constexpr std::array 与透明比较器",
+            "复用同一最小堆骨架完成 778 水位上升的泳池中游泳"
+          ]
+        },
+        {
+          "id": "432",
+          "title": "All O`one Data Structure",
+          "cn": "全 O(1) 的数据结构",
+          "tier": "core",
+          "est": 60,
+          "idea": "用 list<Bucket> 按计数维护桶，每个桶拥有 unordered_set<string>，再用 unordered_map<string, list<Bucket>::iterator> 定位键。list 负责节点 RAII 和迭代器稳定性，创建键时用 try_emplace；inc/dec 只在相邻桶间移动字符串。",
+          "pitfall": "移动键后必须更新定位表，空桶要立即删除，但删除桶之前先拿好目标迭代器。list 只保证未删除节点的迭代器稳定；unordered_set 的 rehash 仍会让其内部迭代器失效，所以不要缓存集合迭代器。",
+          "variants": [
+            "C++17 复习：RAII 容器所有权、稳定迭代器、try_emplace 与 move",
+            "实现调试版 invariant checker：计数严格递增、每个 key 只出现一次"
+          ]
+        },
+        {
+          "id": "591",
+          "title": "Tag Validator",
+          "cn": "标签验证器",
+          "tier": "optional",
+          "est": 50,
+          "idea": "用 string_view + 游标写一个单遍解析器，parseTag 返回 optional<Tag> 区分非法标签与合法结果；标签栈只保存拥有型 string 或稳定输入上的 view。CDATA 在当前已有根标签时整体跳过，普通文本一直消费到下一个 '<'。",
+          "pitfall": "整段输入必须恰好被一个根标签包住，根闭合后不能再有字符；CDATA 只在标签内部有效。若栈保存 string_view，必须保证它们始终指向函数参数而不是临时 substring；C++17 没有 starts_with，要用 compare 或手写前缀检查。",
+          "variants": [
+            "C++17 复习：string_view、optional、if 初始化语句与借用视图的生命周期",
+            "扩展：返回包含错误偏移和期望 token 的解析结果"
+          ]
+        },
+        {
+          "id": "726",
+          "title": "Number of Atoms",
+          "cn": "原子的数量",
+          "tier": "core",
+          "est": 50,
+          "idea": "用 string_view + 游标解析 Atom、Number 和括号，Number 通过 from_chars 读取；每层返回 map<string,long long>。合并子层时用 structured bindings + try_emplace 累加，进阶版可用 extract 的 node handle 做小表并入大表并显式处理同名碰撞。",
+          "pitfall": "右括号后的倍数可能多位，缺省倍数是 1；元素名必须以大写开头并吞掉后续小写。map::merge 不会合并重复 key，只会把冲突节点留在源表，若直接丢弃源表会丢计数。",
+          "variants": [
+            "C++17 复习：from_chars、string_view、try_emplace、structured bindings 与 node handle",
+            "比较递归返回 map 与显式 stack<map> 两种所有权模型"
+          ]
+        },
+        {
+          "id": "732",
+          "title": "My Calendar III",
+          "cn": "我的日程安排表 III",
+          "tier": "core",
+          "est": 65,
+          "idea": "在 [0, 1e9) 上写动态开点线段树，Node 用 unique_ptr 管左右孩子，访问到时 make_unique，节点维护区间最大值和 lazy 增量。book(start,end) 只更新半开区间 [start,end)，根节点 max 即答案，全程不出现裸 new/delete。",
+          "pitfall": "题目区间是半开区间，若树实现为闭区间要更新 [start,end-1]。push/pull 时空孩子视为 0，但父节点 lazy 必须叠加到孩子最大值；移动 unique_ptr 后原指针为空，递归接口应传 Node& 或 unique_ptr<Node>&。",
+          "variants": [
+            "C++17 复习：unique_ptr、make_unique、RAII、移动语义与递归所有权",
+            "对比 sweep-line map 解法与动态线段树的常数、内存和复杂度"
+          ]
+        },
+        {
+          "id": "1096",
+          "title": "Brace Expansion II",
+          "cn": "花括号展开 II",
+          "tier": "core",
+          "est": 60,
+          "idea": "用 string_view 写递归下降：expression 处理逗号并集，term 处理相邻项笛卡尔积，factor 处理字母或花括号。每层返回 set<string>；并集时用 set::merge 转移节点，笛卡尔积时只为真实结果分配字符串。",
+          "pitfall": "连接的优先级高于逗号并集，解析层级写反会在嵌套表达式上出错。set::merge 遇到重复值会把冲突节点留在源集合，源集合随后可以丢弃但不能误以为返回了重复计数。moved-from 集合仍然有效但状态未指定，只能做不依赖原内容的操作或重新赋值。",
+          "variants": [
+            "C++17 复习：string_view、generic lambda、set::merge/node handle 与移动语义",
+            "把解析结果改为 variant<Literal, Union, Product> AST，再单独求值"
+          ]
+        },
+        {
+          "id": "1106",
+          "title": "Parsing A Boolean Expression",
+          "cn": "解析布尔表达式",
+          "tier": "core",
+          "est": 45,
+          "idea": "将词法 token 建模为 variant<bool, char>，用栈归约括号表达式；取到一组参数后通过 visit 处理字面量和运算符。也可定义 overloaded 辅助器让 std::visit 的各分支保持穷尽，避免用整数哨兵混淆 true/false 与操作符。",
+          "pitfall": "不要用 vector<bool> 保存参数后再依赖普通 bool&，它返回的是代理对象；用 true/false 计数或普通 byte 容器更清楚。visit 必须覆盖 variant 的所有备选类型，'!' 恰好一个参数，而 '&'/'|' 可以有多个。",
+          "variants": [
+            "C++17 复习：variant、visit、overloaded lambda 与类型安全 token",
+            "扩展为先构建 AST 再求值，并用 unique_ptr 明确树节点所有权"
+          ]
+        },
+        {
+          "id": "1172",
+          "title": "Dinner Plate Stacks",
+          "cn": "餐盘栈",
+          "tier": "optional",
+          "est": 60,
+          "idea": "用 vector<vector<int>> 保存每摞，set<size_t> 维护尚未满的下标，另用 set 或最大堆维护非空下标。push 取最小可用下标，pop 取最大非空下标；用 if (auto it = available.begin(); it != available.end()) 把查找和作用域绑定。",
+          "pitfall": "popAtStack 后原本满的栈要重新进入 available；尾部空栈收缩后，两个索引结构里的陈旧下标都要清理。若使用 priority_queue 惰性删除，不能只清一次堆顶；每次操作前都要循环弹掉所有失效项。",
+          "variants": [
+            "C++17 复习：if 初始化语句、结构化容器不变量与透明比较器",
+            "分别实现双 set 与 set+惰性堆版本，比较状态同步复杂度"
+          ]
+        },
+        {
+          "id": "2097",
+          "title": "Valid Arrangement of Pairs",
+          "cn": "合法重新排列数对",
+          "tier": "core",
+          "est": 50,
+          "idea": "把数对看成有向边，用 Hierholzer 求欧拉路径。LeetCode 输入元素是 vector<int>，应显式读取 edge[0]/edge[1]；遍历度数表时再用 structured bindings，通过 try_emplace 建邻接表并记录出入度。为避免深递归，使用 vector<int> 作为显式栈，消费边后反向生成路径。",
+          "pitfall": "起点优先选择 out-in=1 的节点，否则任选有出边节点；平行边必须全部保留，不能用 set 去重。unordered_map rehash 只使迭代器失效，mapped 对象的引用仍有效；但邻接 vector 自身扩容会使指向其元素的引用或指针失效。",
+          "variants": [
+            "C++17 复习：structured bindings、try_emplace、移动语义与显式栈",
+            "扩展：输出每条原始边的下标，并验证所有边恰好消费一次"
+          ]
+        }
+      ]
     }
   ]
 }
