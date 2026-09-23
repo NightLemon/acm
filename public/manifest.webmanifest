@@ -1,7 +1,7 @@
 {
-  "name": "算法训练 · 28 天课程",
-  "short_name": "算法训练",
-  "description": "28 天算法训练课程：完整题面、解题思路与易错点。",
+  "name": "个人刷题库",
+  "short_name": "刷题库",
+  "description": "可导入、保存和切换的个人 LeetCode 刷题库。",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

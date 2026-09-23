@@ -1,32 +1,19 @@
 import { useState, useEffect, useCallback } from 'react';
-
-const KEY = 'acm-prep-notes-v1';
-
-function load() {
-  try {
-    const raw = localStorage.getItem(KEY);
-    return raw ? JSON.parse(raw) : {};
-  } catch {
-    return {};
-  }
-}
+import { clearLibraryState, loadLibraryState, saveLibraryState } from './libraryState.js';
 
 /**
- * Per-problem free text: { [problemId]: string }.
- * Meant for the one-line takeaway you want to see again on a second pass —
- * the state definition, the boundary that bit you, the trick you missed.
- * Same flat shape as progress so curriculum edits never invalidate it.
+ * Per-problem free text inside one library.
  */
-export function useNotes() {
-  const [notes, setNotes] = useState(load);
+export function useNotes(libraryId) {
+  const [notes, setNotes] = useState(() => loadLibraryState('notes', libraryId));
 
   useEffect(() => {
     try {
-      localStorage.setItem(KEY, JSON.stringify(notes));
+      saveLibraryState('notes', libraryId, notes);
     } catch {
       /* quota / private mode — notes just won't persist */
     }
-  }, [notes]);
+  }, [libraryId, notes]);
 
   const setNote = useCallback((id, text) => {
     setNotes((n) => {
@@ -37,5 +24,10 @@ export function useNotes() {
     });
   }, []);
 
-  return { notes, setNote };
+  const clear = useCallback(() => {
+    setNotes({});
+    try { clearLibraryState('notes', libraryId); } catch { /* ignore */ }
+  }, [libraryId]);
+
+  return { notes, setNote, clear };
 }

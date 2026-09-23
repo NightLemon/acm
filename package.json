@@ -11,6 +11,7 @@
     "icons": "node scripts/make-icons.mjs",
     "data": "node scripts/fetch-problems.mjs && node scripts/build.mjs && node scripts/fetch-statements.mjs",
     "rebuild": "node scripts/build.mjs",
+    "templates": "node scripts/fetch-problems.mjs",
     "statements": "node scripts/fetch-statements.mjs"
   },
   "dependencies": {

@@ -1,11 +1,15 @@
-// Fetch canonical LeetCode problem metadata (id/title/slug/difficulty) -> data/leetcode-index.json
+// Fetch canonical LeetCode metadata and official C++/Python answer templates.
 import { writeFileSync } from 'node:fs';
 
 const ENDPOINT = 'https://leetcode.com/graphql';
 const QUERY = `query problemsetQuestionList($categorySlug:String,$limit:Int,$skip:Int,$filters:QuestionListFilterInput){
   problemsetQuestionList:questionList(categorySlug:$categorySlug,limit:$limit,skip:$skip,filters:$filters){
     total:totalNum
-    questions:data{ questionFrontendId title titleSlug difficulty paidOnly:isPaidOnly topicTags{ name slug } }
+    questions:data{
+      questionFrontendId title titleSlug difficulty paidOnly:isPaidOnly
+      topicTags{ name slug }
+      codeSnippets{ langSlug code }
+    }
   }
 }`;
 
@@ -46,6 +50,7 @@ for (let skip = PAGE; skip < total; skip += PAGE) {
 console.log('');
 
 const byId = {};
+const templates = {};
 for (const q of all) {
   byId[q.questionFrontendId] = {
     id: q.questionFrontendId,
@@ -55,6 +60,13 @@ for (const q of all) {
     paidOnly: q.paidOnly,
     tags: q.topicTags.map(t => t.name),
   };
+  const snippets = Object.fromEntries(
+    (q.codeSnippets || []).map((snippet) => [snippet.langSlug, snippet.code])
+  );
+  const cpp = snippets.cpp || null;
+  const python = snippets.python3 || snippets.python || null;
+  if (cpp || python) templates[q.questionFrontendId] = { cpp, python };
 }
 writeFileSync(new URL('../data/leetcode-index.json', import.meta.url), JSON.stringify(byId, null, 0));
-console.log(`wrote ${Object.keys(byId).length} problems`);
+writeFileSync(new URL('../data/code-templates.json', import.meta.url), JSON.stringify(templates));
+console.log(`wrote ${Object.keys(byId).length} problems and ${Object.keys(templates).length} code templates`);

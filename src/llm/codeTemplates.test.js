@@ -4,11 +4,17 @@ import { detectTargetFunction, detectTargetInterface } from './codeAnonymizer.js
 
 describe('official code templates', () => {
   it('包含课程题目的 C++ 与 Python 模板', () => {
-    expect(Object.keys(codeTemplates).length).toBeGreaterThan(190);
+    expect(Object.keys(codeTemplates).length).toBeGreaterThan(3000);
     for (const template of Object.values(codeTemplates)) {
-      expect(typeof template.cpp).toBe('string');
-      expect(typeof template.python).toBe('string');
+      expect(typeof template.cpp === 'string' || template.cpp === null).toBe(true);
+      expect(typeof template.python === 'string' || template.python === null).toBe(true);
+      expect(Boolean(template.cpp || template.python)).toBe(true);
     }
+  });
+
+  it('包含课程之外的新题官方模板', () => {
+    expect(codeTemplates['4000'].cpp).toContain('class Solution');
+    expect(codeTemplates['4000'].python).toContain('class Solution');
   });
 
   it('第 33 题自动载入预期接口并可脱敏', () => {
@@ -20,7 +26,7 @@ describe('official code templates', () => {
       '    }',
       '};',
     ].join('\n'));
-    expect(codeTemplates['33'].python).toContain('def search(self, nums: List[int], target: int) -> int:');
+    expect(codeTemplates['33'].python).toContain('def search(self, nums: list[int], target: int) -> int:');
     expect(detectTargetFunction(codeTemplates['33'].cpp, 'cpp')).toMatchObject({
       ok: true,
       targetName: 'search',

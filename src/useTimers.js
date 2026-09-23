@@ -1,26 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-
-const KEY = 'acm-prep-timers-v1';
-
-function load() {
-  try {
-    const raw = localStorage.getItem(KEY);
-    return raw ? JSON.parse(raw) : {};
-  } catch {
-    return {};
-  }
-}
+import { clearLibraryState, loadLibraryState, saveLibraryState } from './libraryState.js';
 
 /**
- * Accumulated think-time per problem, in seconds: { [problemId]: number }.
- *
- * The curriculum repeatedly says "sit with it for 15 minutes before opening the
- * hints" — this is what makes that visible instead of aspirational. Time only
- * accrues while a problem row is expanded, and it survives reloads so a problem
- * you came back to twice shows the total.
+ * Accumulated think-time per problem inside one library.
  */
-export function useTimers() {
-  const [elapsed, setElapsed] = useState(load);
+export function useTimers(libraryId) {
+  const [elapsed, setElapsed] = useState(() => loadLibraryState('timers', libraryId));
   // Which problem is currently accruing time, and since when (epoch ms).
   const running = useRef(null);
 
@@ -28,11 +13,11 @@ export function useTimers() {
   // most, and only for the single open problem).
   useEffect(() => {
     try {
-      localStorage.setItem(KEY, JSON.stringify(elapsed));
+      saveLibraryState('timers', libraryId, elapsed);
     } catch {
       /* quota / private mode */
     }
-  }, [elapsed]);
+  }, [elapsed, libraryId]);
 
   // Single interval for the whole app rather than one per row.
   useEffect(() => {
@@ -80,7 +65,13 @@ export function useTimers() {
     if (r && r.id === id) r.since = Date.now();
   }, []);
 
-  return { elapsed, start, stop, clear };
+  const clearAll = useCallback(() => {
+    running.current = null;
+    setElapsed({});
+    try { clearLibraryState('timers', libraryId); } catch { /* ignore */ }
+  }, [libraryId]);
+
+  return { elapsed, start, stop, clear, clearAll };
 }
 
 export function fmtTime(sec) {

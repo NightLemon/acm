@@ -1,31 +1,19 @@
 import { useState, useEffect, useCallback } from 'react';
-
-const KEY = 'acm-prep-progress-v1';
-
-function load() {
-  try {
-    const raw = localStorage.getItem(KEY);
-    return raw ? JSON.parse(raw) : {};
-  } catch {
-    return {};
-  }
-}
+import { clearLibraryState, loadLibraryState, saveLibraryState } from './libraryState.js';
 
 /**
- * Progress is a flat map: { [problemId]: true }.
- * Kept deliberately dumb so it survives curriculum edits — adding or removing
- * problems never invalidates existing checkmarks.
+ * Progress stays flat inside one library and is namespaced in browser storage.
  */
-export function useProgress() {
-  const [done, setDone] = useState(load);
+export function useProgress(libraryId) {
+  const [done, setDone] = useState(() => loadLibraryState('progress', libraryId));
 
   useEffect(() => {
     try {
-      localStorage.setItem(KEY, JSON.stringify(done));
+      saveLibraryState('progress', libraryId, done);
     } catch {
       /* quota / private mode — progress just won't persist */
     }
-  }, [done]);
+  }, [done, libraryId]);
 
   const toggle = useCallback((id) => {
     setDone((d) => {
@@ -36,21 +24,10 @@ export function useProgress() {
     });
   }, []);
 
-  const reset = useCallback(() => {
-    if (!confirm('清空所有进度、笔记和计时？此操作不可撤销。')) return;
-    // Write straight to storage rather than going through setState — the
-    // persist effect wouldn't get a chance to run before the reload below.
-    // Notes and timers are keyed the same way and are meaningless without the
-    // progress they annotate, so they go too.
-    try {
-      localStorage.removeItem(KEY);
-      localStorage.removeItem('acm-prep-notes-v1');
-      localStorage.removeItem('acm-prep-timers-v1');
-    } catch { /* ignore */ }
-    // Those live in sibling hooks with their own state; reloading is the
-    // simplest way to get every consumer back in sync.
-    location.reload();
-  }, []);
+  const clear = useCallback(() => {
+    setDone({});
+    try { clearLibraryState('progress', libraryId); } catch { /* ignore */ }
+  }, [libraryId]);
 
-  return { done, toggle, reset };
+  return { done, toggle, clear };
 }

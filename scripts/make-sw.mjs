@@ -66,8 +66,8 @@ self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
 
-  const url = new URL(req.url);
-  if (url.origin !== self.location.origin) return;  // let LeetCode images go to network
+  const requestUrl = new URL(req.url);
+  if (requestUrl.origin !== self.location.origin) return;  // let LeetCode images go to network
 
   // Navigations: serve the shell so deep links and offline launches both work.
   if (req.mode === 'navigate') {
@@ -78,7 +78,7 @@ self.addEventListener('fetch', (e) => {
   }
 
   // Statements: cache-first, then populate on demand.
-  if (url.pathname.includes('/statements/')) {
+  if (requestUrl.pathname.includes('/statements/')) {
     e.respondWith(
       caches.match(req).then((hit) => {
         if (hit) return hit;

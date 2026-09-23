@@ -45,7 +45,7 @@ function Statement({ id }) {
   if (missing || !data?.content) {
     return (
       <div className="stmt-state">
-        本地没有题面数据。运行 <code>npm run statements</code> 抓取，或直接用下方链接查看。
+        当前部署未缓存这道题的题面，请使用下方链接前往力扣查看。
       </div>
     );
   }
@@ -112,7 +112,7 @@ export function ProblemRow({ p, done, onToggle, open, onOpen, timer, note, onNot
         </a>
         <span className="ptitle">
           <span className="cn">{p.cn || p.title}</span>
-          <span className="en">{p.title}</span>
+          {p.cn && <span className="en">{p.title}</span>}
         </span>
         <span className="badges">
           {spent > 0 && (
@@ -166,8 +166,10 @@ export function ProblemRow({ p, done, onToggle, open, onOpen, timer, note, onNot
             {onDescribe && (
               <button className="plink describe" onClick={() => onDescribe(p.id)}>描述逻辑并生成代码 →</button>
             )}
-            <a className="plink" href={p.url} target="_blank" rel="noreferrer">力扣 · 提交 / 题解 ↗</a>
-            <a className="plink" href={p.urlEn} target="_blank" rel="noreferrer">LeetCode ↗</a>
+            <a className="plink" href={p.url} target="_blank" rel="noreferrer">LeetCode · 提交 / 题解 ↗</a>
+            {p.urlEn && p.urlEn !== p.url && (
+              <a className="plink" href={p.urlEn} target="_blank" rel="noreferrer">LeetCode ↗</a>
+            )}
             {spent > 0 && (
               <button className="plink ghost" onClick={() => timer.clear(p.id)}>重置计时</button>
             )}

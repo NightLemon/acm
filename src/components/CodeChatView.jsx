@@ -55,9 +55,8 @@ function AssistantMessage({ message }) {
   );
 }
 
-export function CodeChatView({ problemMeta, embedded = false }) {
-  const { session, updateSession, clearSession, ready, storageError } = useCodeSession(problemMeta?.id);
-  const [draft, setDraft] = useState('');
+export function CodeChatView({ problemMeta, embedded = false, libraryId }) {
+  const { session, updateSession, clearSession, ready, storageError } = useCodeSession(problemMeta?.id, libraryId);
   const [heightKey, setHeightKey] = useState(embedded ? 'compact' : 'standard');
   const [provider, setProvider] = useState(loadProviderSettings);
   const [providerOpen, setProviderOpen] = useState(() => !loadProviderSettings().apiKey);
@@ -184,7 +183,7 @@ export function CodeChatView({ problemMeta, embedded = false }) {
   const submit = async (event) => {
     event?.preventDefault();
     if (busy) return;
-    const content = draft.trim();
+    const content = session.draft.trim();
     if (!content) { setError('请先描述要实现的逻辑。'); return; }
     if (!detection.ok) { setError(detection.error); return; }
     try { validateProviderConfig(provider); }
@@ -209,8 +208,7 @@ export function CodeChatView({ problemMeta, embedded = false }) {
     };
     const controller = new AbortController();
     abortRef.current = controller;
-    updateSession({ ...session, messages: conversation });
-    setDraft('');
+    updateSession({ ...session, messages: conversation, draft: '' });
     setError('');
     setBusy('validating');
 
@@ -295,7 +293,6 @@ export function CodeChatView({ problemMeta, embedded = false }) {
       source: template,
       sources: { cpp: '', python: '', [language]: template },
     });
-    setDraft('');
     setError('');
   };
 
@@ -341,7 +338,9 @@ export function CodeChatView({ problemMeta, embedded = false }) {
             <span>
               {problemMeta && currentTemplate
                 ? `已自动载入题目 ${problemMeta.id} 的官方 ${session.language === 'python' ? 'Python 3' : 'C++17'} 模板`
-                : <>粘贴包含输入输出定义的 <code>class Solution</code></>}
+                : problemMeta
+                  ? <>此题未提供可用的官方 {session.language === 'python' ? 'Python 3' : 'C++17'} 模板，请切换语言或手动粘贴接口</>
+                  : <>粘贴包含输入输出定义的 <code>class Solution</code></>}
             </span>
           </div>
           <div className="code-toolbar">
@@ -447,7 +446,7 @@ export function CodeChatView({ problemMeta, embedded = false }) {
         <div className="code-panel-head chat-head">
           <div>
             <b>逻辑描述</b>
-            <span>完整生成通常调用模型两次：先校验，再生成</span>
+            <span>草稿与描述记录自动缓存在当前浏览器 · 完整生成通常调用模型两次</span>
           </div>
           {busy && <span className="busy-badge">{busy === 'validating' ? '正在检查描述…' : '正在生成代码…'}</span>}
         </div>
@@ -464,8 +463,8 @@ export function CodeChatView({ problemMeta, embedded = false }) {
         {error && <div className="code-error" role="alert">{error}</div>}
         <form className="code-composer" onSubmit={submit}>
           <textarea
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
+            value={session.draft}
+            onChange={(e) => updateSession((current) => ({ ...current, draft: e.target.value }))}
             onKeyDown={keyDown}
             disabled={!!busy}
             rows={4}
@@ -477,7 +476,7 @@ export function CodeChatView({ problemMeta, embedded = false }) {
               : '发送前会自动检查类接口'}</span>
             {busy
               ? <button className="code-send cancel" type="button" onClick={cancel}>取消</button>
-              : <button className="code-send" type="submit" disabled={!draft.trim()}>校验并生成</button>}
+              : <button className="code-send" type="submit" disabled={!session.draft.trim()}>校验并生成</button>}
           </div>
         </form>
       </section>

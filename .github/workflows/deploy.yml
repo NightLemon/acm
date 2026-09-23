@@ -28,6 +28,9 @@ jobs:
 
       - run: npm ci
 
+      # Keep URL resolution and official answer templates current at deploy time.
+      - run: npm run templates
+
       # Rebuild curriculum.json from data/raw so a bad problem id fails CI
       # instead of shipping.
       - run: npm run rebuild
