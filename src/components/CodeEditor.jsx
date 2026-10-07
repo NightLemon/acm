@@ -3,7 +3,7 @@ import CodeMirror from '@uiw/react-codemirror';
 import { cpp } from '@codemirror/lang-cpp';
 import { python } from '@codemirror/lang-python';
 
-export function CodeEditor({ value, language, height, onChange, disabled }) {
+export function CodeEditor({ value, language, height, onChange, disabled, entryMode = 'class' }) {
   const viewRef = useRef(null);
   const extensions = useMemo(
     () => [language === 'python' ? python() : cpp()],
@@ -53,9 +53,13 @@ export function CodeEditor({ value, language, height, onChange, disabled }) {
         completionKeymap: false,
         lintKeymap: false,
       }}
-      placeholder={language === 'python'
-        ? '粘贴包含唯一目标方法的 class Solution...'
-        : '粘贴包含唯一 public 目标方法的 class Solution...'}
+      placeholder={entryMode === 'function'
+        ? language === 'python'
+          ? '粘贴顶层 def 函数及调用入口（如 main / solve）...'
+          : '粘贴带函数体的普通函数或 int main(...) ...'
+        : language === 'python'
+          ? '粘贴包含目标方法的 class Solution 或自定义类...'
+          : '粘贴包含 public 目标方法的 class Solution 或自定义类...'}
       aria-label="代码编辑器"
     />
   );

@@ -1,16 +1,17 @@
 {
  "generatedAt": null,
  "stats": {
-  "totalProblems": 212,
-  "uniqueProblems": 203,
-  "core": 107,
-  "optional": 105,
+  "totalProblems": 284,
+  "uniqueProblems": 275,
+  "core": 158,
+  "optional": 126,
   "byDifficulty": {
-   "Medium": 63,
-   "Hard": 149
+   "Medium": 119,
+   "Hard": 159,
+   "Easy": 6
   },
   "paidOnly": [],
-  "totalMinutes": 7609
+  "totalMinutes": 9879
  },
  "algoDays": [
   {
@@ -5414,6 +5415,1571 @@
      ],
      "url": "https://leetcode.cn/problems/valid-arrangement-of-pairs/",
      "urlEn": "https://leetcode.com/problems/valid-arrangement-of-pairs/"
+    }
+   ]
+  },
+  {
+   "week": 5,
+   "day": 30,
+   "title": "面试加练 · 线性 DP 与状态定义",
+   "focus": "从基础递推到多状态维护；先口述状态含义、初始化和返回位置，再写代码。非公司真题或频率排名。",
+   "drill": "对每个状态说明它对应哪个前缀，检查空前缀与最短输入。",
+   "problems": [
+    {
+     "id": "70",
+     "title": "Climbing Stairs",
+     "cn": "爬楼梯",
+     "slug": "climbing-stairs",
+     "difficulty": "Easy",
+     "paidOnly": false,
+     "tags": [
+      "Math",
+      "Dynamic Programming",
+      "Memoization"
+     ],
+     "tier": "optional",
+     "est": 15,
+     "idea": "按最后一步来自前一阶还是前两阶分类，累加到达方案。",
+     "pitfall": "明确最初两项的含义，别把阶数和数组下标混用。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/climbing-stairs/",
+     "urlEn": "https://leetcode.com/problems/climbing-stairs/"
+    },
+    {
+     "id": "746",
+     "title": "Min Cost Climbing Stairs",
+     "cn": "使用最小花费爬楼梯",
+     "slug": "min-cost-climbing-stairs",
+     "difficulty": "Easy",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Dynamic Programming"
+     ],
+     "tier": "optional",
+     "est": 20,
+     "idea": "定义到达某个位置的最小费用，转移时支付离开的台阶费用。",
+     "pitfall": "楼顶不是 cost 中的一个收费台阶；可以从位置 0 或 1 开始。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/min-cost-climbing-stairs/",
+     "urlEn": "https://leetcode.com/problems/min-cost-climbing-stairs/"
+    },
+    {
+     "id": "198",
+     "title": "House Robber",
+     "cn": "打家劫舍",
+     "slug": "house-robber",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Dynamic Programming"
+     ],
+     "tier": "core",
+     "est": 25,
+     "idea": "前缀最优值在跳过当前房屋与选它并接上前两间的最优值之间取大。",
+     "pitfall": "滚动变量更新不能覆盖仍要读取的旧状态。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/house-robber/",
+     "urlEn": "https://leetcode.com/problems/house-robber/"
+    },
+    {
+     "id": "213",
+     "title": "House Robber II",
+     "cn": "打家劫舍 II",
+     "slug": "house-robber-ii",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Dynamic Programming"
+     ],
+     "tier": "core",
+     "est": 30,
+     "idea": "环的首尾不能同时选，分别求排除首间和排除末间的线性问题。",
+     "pitfall": "只有一间房时单独处理，两个区间的端点要统一。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/house-robber-ii/",
+     "urlEn": "https://leetcode.com/problems/house-robber-ii/"
+    },
+    {
+     "id": "740",
+     "title": "Delete and Earn",
+     "cn": "删除并获得点数",
+     "slug": "delete-and-earn",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Hash Table",
+      "Dynamic Programming"
+     ],
+     "tier": "core",
+     "est": 30,
+     "idea": "先按数值聚合收益，再在相邻数值不能同时选的限制下做 DP。",
+     "pitfall": "冲突由数值相邻决定，不是原数组中的位置相邻。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/delete-and-earn/",
+     "urlEn": "https://leetcode.com/problems/delete-and-earn/"
+    },
+    {
+     "id": "91",
+     "title": "Decode Ways",
+     "cn": "解码方法",
+     "slug": "decode-ways",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "String",
+      "Dynamic Programming"
+     ],
+     "tier": "core",
+     "est": 30,
+     "idea": "按末尾使用一位或两位编码分类，累计合法前缀的方案数。",
+     "pitfall": "0 不能单独解码；两位编码不能有前导零，且不能超过 26。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/decode-ways/",
+     "urlEn": "https://leetcode.com/problems/decode-ways/"
+    },
+    {
+     "id": "152",
+     "title": "Maximum Product Subarray",
+     "cn": "乘积最大子数组",
+     "slug": "maximum-product-subarray",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Dynamic Programming"
+     ],
+     "tier": "core",
+     "est": 30,
+     "idea": "同时保存以当前位置结尾的最大和最小乘积，负数可能使两者交换角色。",
+     "pitfall": "两个新状态都要由旧状态计算；答案不是只看最后一个位置。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/maximum-product-subarray/",
+     "urlEn": "https://leetcode.com/problems/maximum-product-subarray/"
+    },
+    {
+     "id": "53",
+     "title": "Maximum Subarray",
+     "cn": "最大子数组和",
+     "slug": "maximum-subarray",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Divide and Conquer",
+      "Dynamic Programming"
+     ],
+     "tier": "core",
+     "est": 20,
+     "idea": "以当前位置结尾的最优和，选择重新开始或接在前一段之后。",
+     "pitfall": "子数组非空，全负数时不能返回 0。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/maximum-subarray/",
+     "urlEn": "https://leetcode.com/problems/maximum-subarray/"
+    }
+   ]
+  },
+  {
+   "week": 5,
+   "day": 31,
+   "title": "面试加练 · 网格 DP",
+   "focus": "区分路径计数、最小代价和以某格结尾的形状；练习二维状态压缩。",
+   "drill": "先写二维版本，再解释压缩后每个旧值和新值代表什么。",
+   "problems": [
+    {
+     "id": "62",
+     "title": "Unique Paths",
+     "cn": "不同路径",
+     "slug": "unique-paths",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Math",
+      "Dynamic Programming",
+      "Combinatorics"
+     ],
+     "tier": "optional",
+     "est": 20,
+     "idea": "每格的方案数来自上方与左方，两条边界各只有一种走法。",
+     "pitfall": "只有一行或一列也应得到一种路径。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/unique-paths/",
+     "urlEn": "https://leetcode.com/problems/unique-paths/"
+    },
+    {
+     "id": "63",
+     "title": "Unique Paths II",
+     "cn": "不同路径 II",
+     "slug": "unique-paths-ii",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Dynamic Programming",
+      "Matrix"
+     ],
+     "tier": "core",
+     "est": 25,
+     "idea": "障碍格方案数为零，其余格由上方和左方相加。",
+     "pitfall": "压缩数组遇到障碍必须清零，不能保留上一行的数据。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/unique-paths-ii/",
+     "urlEn": "https://leetcode.com/problems/unique-paths-ii/"
+    },
+    {
+     "id": "64",
+     "title": "Minimum Path Sum",
+     "cn": "最小路径和",
+     "slug": "minimum-path-sum",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Dynamic Programming",
+      "Matrix"
+     ],
+     "tier": "core",
+     "est": 25,
+     "idea": "当前代价加上两种合法前驱中的较小路径和。",
+     "pitfall": "边界不可达状态不能初始化为零后参与取最小值。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/minimum-path-sum/",
+     "urlEn": "https://leetcode.com/problems/minimum-path-sum/"
+    },
+    {
+     "id": "120",
+     "title": "Triangle",
+     "cn": "三角形最小路径和",
+     "slug": "triangle",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Dynamic Programming"
+     ],
+     "tier": "core",
+     "est": 25,
+     "idea": "自底向上合并相邻的两个子路径代价。",
+     "pitfall": "每一行长度不同，原地更新时确认下一行所需值没有被覆盖。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/triangle/",
+     "urlEn": "https://leetcode.com/problems/triangle/"
+    },
+    {
+     "id": "221",
+     "title": "Maximal Square",
+     "cn": "最大正方形",
+     "slug": "maximal-square",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Dynamic Programming",
+      "Matrix"
+     ],
+     "tier": "core",
+     "est": 30,
+     "idea": "以当前格为右下角的边长，受左、上、左上三个边长的最小值限制。",
+     "pitfall": "返回面积而非边长，字符矩阵中的元素不是整数 1。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/maximal-square/",
+     "urlEn": "https://leetcode.com/problems/maximal-square/"
+    },
+    {
+     "id": "931",
+     "title": "Minimum Falling Path Sum",
+     "cn": "下降路径最小和",
+     "slug": "minimum-falling-path-sum",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Dynamic Programming",
+      "Matrix"
+     ],
+     "tier": "core",
+     "est": 25,
+     "idea": "从上一行三个可能来源转移，最后一行所有终点取最小值。",
+     "pitfall": "行内原地覆盖会混用两行状态；边列要排除越界来源。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/minimum-falling-path-sum/",
+     "urlEn": "https://leetcode.com/problems/minimum-falling-path-sum/"
+    },
+    {
+     "id": "1277",
+     "title": "Count Square Submatrices with All Ones",
+     "cn": "统计全为 1 的正方形子矩阵",
+     "slug": "count-square-submatrices-with-all-ones",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Dynamic Programming",
+      "Matrix"
+     ],
+     "tier": "optional",
+     "est": 30,
+     "idea": "每格的最大正方形边长，也等于以该格为右下角的正方形数量。",
+     "pitfall": "累计所有格子的边长，而不是只统计全局最大正方形。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/count-square-submatrices-with-all-ones/",
+     "urlEn": "https://leetcode.com/problems/count-square-submatrices-with-all-ones/"
+    }
+   ]
+  },
+  {
+   "week": 5,
+   "day": 32,
+   "title": "面试加练 · 背包与组合计数",
+   "focus": "辨别可重复使用、选取次数限制、排列与组合，以及布尔可达和最优值的区别。",
+   "drill": "用很小的输入解释循环顺序为何影响答案。",
+   "problems": [
+    {
+     "id": "416",
+     "title": "Partition Equal Subset Sum",
+     "cn": "分割等和子集",
+     "slug": "partition-equal-subset-sum",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Dynamic Programming",
+      "Knapsack Problem",
+      "0-1 Knapsack"
+     ],
+     "tier": "core",
+     "est": 30,
+     "idea": "总和为偶数时，转化为是否能用每个数至多一次凑出一半总和。",
+     "pitfall": "容量倒序遍历，否则会重复使用同一个元素。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/partition-equal-subset-sum/",
+     "urlEn": "https://leetcode.com/problems/partition-equal-subset-sum/"
+    },
+    {
+     "id": "1049",
+     "title": "Last Stone Weight II",
+     "cn": "最后一块石头的重量 II",
+     "slug": "last-stone-weight-ii",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Dynamic Programming",
+      "Knapsack Problem",
+      "0-1 Knapsack"
+     ],
+     "tier": "core",
+     "est": 35,
+     "idea": "把最终差值转成两组重量差，寻找不超过总和一半的最大可达和。",
+     "pitfall": "不是每一步都贪心粉碎当前最重的两块；答案为总和减去两倍较小组重量。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/last-stone-weight-ii/",
+     "urlEn": "https://leetcode.com/problems/last-stone-weight-ii/"
+    },
+    {
+     "id": "474",
+     "title": "Ones and Zeroes",
+     "cn": "一和零",
+     "slug": "ones-and-zeroes",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "String",
+      "Dynamic Programming",
+      "Knapsack Problem",
+      "0-1 Knapsack"
+     ],
+     "tier": "core",
+     "est": 35,
+     "idea": "统计每个字符串消耗的 0 和 1，做两个容量维度的 0/1 背包。",
+     "pitfall": "两个容量维度都要倒序，字符串本身是不可拆分的一个物品。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/ones-and-zeroes/",
+     "urlEn": "https://leetcode.com/problems/ones-and-zeroes/"
+    },
+    {
+     "id": "377",
+     "title": "Combination Sum IV",
+     "cn": "组合总和 IV",
+     "slug": "combination-sum-iv",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Dynamic Programming"
+     ],
+     "tier": "core",
+     "est": 30,
+     "idea": "按最后选的数字分类，对每个目标和累计所有前驱的有序方案。",
+     "pitfall": "顺序不同算不同方案；先遍历数字会变成另一个计数问题。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/combination-sum-iv/",
+     "urlEn": "https://leetcode.com/problems/combination-sum-iv/"
+    },
+    {
+     "id": "279",
+     "title": "Perfect Squares",
+     "cn": "完全平方数",
+     "slug": "perfect-squares",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Math",
+      "Dynamic Programming",
+      "Breadth-First Search",
+      "Knapsack Problem",
+      "Complete Knapsack"
+     ],
+     "tier": "core",
+     "est": 25,
+     "idea": "枚举最后一个平方数，从剩余和的最少项数转移。",
+     "pitfall": "平方数可以重复使用，初始化不可达值时避免加一溢出。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/perfect-squares/",
+     "urlEn": "https://leetcode.com/problems/perfect-squares/"
+    },
+    {
+     "id": "343",
+     "title": "Integer Break",
+     "cn": "整数拆分",
+     "slug": "integer-break",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Math",
+      "Dynamic Programming"
+     ],
+     "tier": "optional",
+     "est": 30,
+     "idea": "枚举第一次拆分的位置，比较余数继续拆与不再拆的乘积。",
+     "pitfall": "必须至少拆成两项，不能直接把原数当最终答案。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/integer-break/",
+     "urlEn": "https://leetcode.com/problems/integer-break/"
+    },
+    {
+     "id": "139",
+     "title": "Word Break",
+     "cn": "单词拆分",
+     "slug": "word-break",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Hash Table",
+      "String",
+      "Dynamic Programming",
+      "Trie",
+      "Memoization",
+      "Brute-Force Search"
+     ],
+     "tier": "core",
+     "est": 30,
+     "idea": "前缀可达且接上的一段在词典中，才能到达新的分割位置。",
+     "pitfall": "空前缀是可达起点，不能只贪心匹配最长单词。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/word-break/",
+     "urlEn": "https://leetcode.com/problems/word-break/"
+    }
+   ]
+  },
+  {
+   "week": 5,
+   "day": 33,
+   "title": "面试加练 · 双序列与回文 DP",
+   "focus": "用两个下标刻画子问题，训练匹配、不匹配与区间端点的转移。",
+   "drill": "明确子串与子序列的差别，画出状态依赖后决定遍历顺序。",
+   "problems": [
+    {
+     "id": "1143",
+     "title": "Longest Common Subsequence",
+     "cn": "最长公共子序列",
+     "slug": "longest-common-subsequence",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "String",
+      "Dynamic Programming",
+      "Longest Common Subsequence"
+     ],
+     "tier": "core",
+     "est": 30,
+     "idea": "比较两个前缀的末字符，相同则接上左上状态，否则舍去一侧末字符。",
+     "pitfall": "子序列不要求连续；下标与前缀长度差一。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/longest-common-subsequence/",
+     "urlEn": "https://leetcode.com/problems/longest-common-subsequence/"
+    },
+    {
+     "id": "583",
+     "title": "Delete Operation for Two Strings",
+     "cn": "两个字符串的删除操作",
+     "slug": "delete-operation-for-two-strings",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "String",
+      "Dynamic Programming",
+      "Longest Common Subsequence"
+     ],
+     "tier": "core",
+     "est": 30,
+     "idea": "求两个前缀变为相同字符串的最少删除次数，相同字符不必删除。",
+     "pitfall": "题目只允许删除，不允许替换；空串边界等于另一串长度。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/delete-operation-for-two-strings/",
+     "urlEn": "https://leetcode.com/problems/delete-operation-for-two-strings/"
+    },
+    {
+     "id": "72",
+     "title": "Edit Distance",
+     "cn": "编辑距离",
+     "slug": "edit-distance",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "String",
+      "Dynamic Programming"
+     ],
+     "tier": "core",
+     "est": 35,
+     "idea": "对两个前缀考虑插入、删除、替换三类最后操作。",
+     "pitfall": "首行首列要初始化为长度，字符相同时不额外加代价。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/edit-distance/",
+     "urlEn": "https://leetcode.com/problems/edit-distance/"
+    },
+    {
+     "id": "97",
+     "title": "Interleaving String",
+     "cn": "交错字符串",
+     "slug": "interleaving-string",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "String",
+      "Dynamic Programming"
+     ],
+     "tier": "core",
+     "est": 35,
+     "idea": "前两串分别用掉 i 和 j 个字符时，检查能否组成目标串前 i+j 个字符。",
+     "pitfall": "两个来源都可能可行，不可贪心只选第一个匹配的来源。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/interleaving-string/",
+     "urlEn": "https://leetcode.com/problems/interleaving-string/"
+    },
+    {
+     "id": "115",
+     "title": "Distinct Subsequences",
+     "cn": "不同的子序列",
+     "slug": "distinct-subsequences",
+     "difficulty": "Hard",
+     "paidOnly": false,
+     "tags": [
+      "String",
+      "Dynamic Programming"
+     ],
+     "tier": "optional",
+     "est": 40,
+     "idea": "在源串前缀中计数：跳过当前字符，或在匹配时使用它延长目标前缀。",
+     "pitfall": "匹配空目标串有一种方式；压缩时目标长度倒序，注意中间计数范围。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/distinct-subsequences/",
+     "urlEn": "https://leetcode.com/problems/distinct-subsequences/"
+    },
+    {
+     "id": "516",
+     "title": "Longest Palindromic Subsequence",
+     "cn": "最长回文子序列",
+     "slug": "longest-palindromic-subsequence",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "String",
+      "Dynamic Programming"
+     ],
+     "tier": "core",
+     "est": 35,
+     "idea": "区间两端相同则使用两端，否则分别舍去一端后取大。",
+     "pitfall": "单字符区间长度为一，外层区间依赖更短区间。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/longest-palindromic-subsequence/",
+     "urlEn": "https://leetcode.com/problems/longest-palindromic-subsequence/"
+    },
+    {
+     "id": "1312",
+     "title": "Minimum Insertion Steps to Make a String Palindrome",
+     "cn": "让字符串成为回文串的最少插入次数",
+     "slug": "minimum-insertion-steps-to-make-a-string-palindrome",
+     "difficulty": "Hard",
+     "paidOnly": false,
+     "tags": [
+      "String",
+      "Dynamic Programming"
+     ],
+     "tier": "optional",
+     "est": 40,
+     "idea": "两端相同则处理内部，否则在两种补齐一端的方案中选较少插入次数。",
+     "pitfall": "端点不同时是取最小值后加一，不是同时补齐两端。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/minimum-insertion-steps-to-make-a-string-palindrome/",
+     "urlEn": "https://leetcode.com/problems/minimum-insertion-steps-to-make-a-string-palindrome/"
+    },
+    {
+     "id": "712",
+     "title": "Minimum ASCII Delete Sum for Two Strings",
+     "cn": "两个字符串的最小 ASCII 删除和",
+     "slug": "minimum-ascii-delete-sum-for-two-strings",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "String",
+      "Dynamic Programming",
+      "Longest Common Subsequence"
+     ],
+     "tier": "core",
+     "est": 35,
+     "idea": "将双序列删除 DP 的单位代价替换为被删除字符的 ASCII 值。",
+     "pitfall": "边界是字符值的前缀和，而不是字符串长度。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/minimum-ascii-delete-sum-for-two-strings/",
+     "urlEn": "https://leetcode.com/problems/minimum-ascii-delete-sum-for-two-strings/"
+    }
+   ]
+  },
+  {
+   "week": 5,
+   "day": 34,
+   "title": "面试加练 · 买卖状态机与序列 DP",
+   "focus": "状态必须表达未来决策需要的全部信息；比较最优长度、最优方案数和路径恢复。",
+   "drill": "逐一解释状态转移是否合法，避免同一轮更新读到错误时刻的状态。",
+   "problems": [
+    {
+     "id": "121",
+     "title": "Best Time to Buy and Sell Stock",
+     "cn": "买卖股票的最佳时机",
+     "slug": "best-time-to-buy-and-sell-stock",
+     "difficulty": "Easy",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Dynamic Programming"
+     ],
+     "tier": "optional",
+     "est": 20,
+     "idea": "维护此前最低价格，枚举卖出日计算收益。",
+     "pitfall": "买入必须早于卖出，不能用未来最低价回头买入。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/best-time-to-buy-and-sell-stock/",
+     "urlEn": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock/"
+    },
+    {
+     "id": "122",
+     "title": "Best Time to Buy and Sell Stock II",
+     "cn": "买卖股票的最佳时机 II",
+     "slug": "best-time-to-buy-and-sell-stock-ii",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Dynamic Programming",
+      "Greedy"
+     ],
+     "tier": "core",
+     "est": 25,
+     "idea": "用持有和未持有两个状态描述当天结束时的最大收益。",
+     "pitfall": "无限次交易仍不能同时持有多份股票；说明状态对应交易前还是交易后。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/best-time-to-buy-and-sell-stock-ii/",
+     "urlEn": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii/"
+    },
+    {
+     "id": "123",
+     "title": "Best Time to Buy and Sell Stock III",
+     "cn": "买卖股票的最佳时机 III",
+     "slug": "best-time-to-buy-and-sell-stock-iii",
+     "difficulty": "Hard",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Dynamic Programming"
+     ],
+     "tier": "core",
+     "est": 40,
+     "idea": "记录最多两次交易过程中买入和卖出后的状态。",
+     "pitfall": "最多两次而不是必须两次；初始化不可达状态，不能凭空获得持仓。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/best-time-to-buy-and-sell-stock-iii/",
+     "urlEn": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iii/"
+    },
+    {
+     "id": "309",
+     "title": "Best Time to Buy and Sell Stock with Cooldown",
+     "cn": "买卖股票的最佳时机含冷冻期",
+     "slug": "best-time-to-buy-and-sell-stock-with-cooldown",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Dynamic Programming"
+     ],
+     "tier": "core",
+     "est": 35,
+     "idea": "区分持有、当天卖出和可买入的休息状态，限制卖出后的买入时刻。",
+     "pitfall": "前一天刚卖出的收益不能立即用于今天买入。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/best-time-to-buy-and-sell-stock-with-cooldown/",
+     "urlEn": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/"
+    },
+    {
+     "id": "714",
+     "title": "Best Time to Buy and Sell Stock with Transaction Fee",
+     "cn": "买卖股票的最佳时机含手续费",
+     "slug": "best-time-to-buy-and-sell-stock-with-transaction-fee",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Dynamic Programming",
+      "Greedy"
+     ],
+     "tier": "core",
+     "est": 30,
+     "idea": "持有与未持有状态之间转移，每笔交易只扣一次手续费。",
+     "pitfall": "不要在买入和卖出时重复扣费。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/",
+     "urlEn": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/"
+    },
+    {
+     "id": "673",
+     "title": "Number of Longest Increasing Subsequence",
+     "cn": "最长递增子序列的个数",
+     "slug": "number-of-longest-increasing-subsequence",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Dynamic Programming",
+      "Binary Indexed Tree",
+      "Segment Tree",
+      "Longest Increasing Subsequence"
+     ],
+     "tier": "core",
+     "est": 35,
+     "idea": "每个终点同时维护最优长度和达到该长度的方案数。",
+     "pitfall": "发现更长方案时替换计数，发现等长方案时累加计数。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/number-of-longest-increasing-subsequence/",
+     "urlEn": "https://leetcode.com/problems/number-of-longest-increasing-subsequence/"
+    },
+    {
+     "id": "368",
+     "title": "Largest Divisible Subset",
+     "cn": "最大整除子集",
+     "slug": "largest-divisible-subset",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Math",
+      "Dynamic Programming",
+      "Sorting"
+     ],
+     "tier": "core",
+     "est": 35,
+     "idea": "排序后做整除链 DP，记录前驱用于恢复一条最长链。",
+     "pitfall": "只返回长度不够；回溯时使用当时记录的前驱而非临时猜测。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/largest-divisible-subset/",
+     "urlEn": "https://leetcode.com/problems/largest-divisible-subset/"
+    },
+    {
+     "id": "1027",
+     "title": "Longest Arithmetic Subsequence",
+     "cn": "最长等差数列",
+     "slug": "longest-arithmetic-subsequence",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Hash Table",
+      "Binary Search",
+      "Dynamic Programming"
+     ],
+     "tier": "core",
+     "est": 35,
+     "idea": "以终点和公差作为状态，接上之前相同公差的序列。",
+     "pitfall": "公差可以为负数或零，新的两元素序列长度是二。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/longest-arithmetic-subsequence/",
+     "urlEn": "https://leetcode.com/problems/longest-arithmetic-subsequence/"
+    }
+   ]
+  },
+  {
+   "week": 5,
+   "day": 35,
+   "title": "面试加练 · 树形、区间与博弈 DP",
+   "focus": "从线性状态推广到树、区间和双方最优决策；作为进阶训练而非公司频率承诺。",
+   "drill": "先说明子问题如何独立，以及转移是否覆盖所有合法选择。",
+   "problems": [
+    {
+     "id": "337",
+     "title": "House Robber III",
+     "cn": "打家劫舍 III",
+     "slug": "house-robber-iii",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Dynamic Programming",
+      "Tree",
+      "Depth-First Search",
+      "Binary Tree",
+      "DP on Trees"
+     ],
+     "tier": "core",
+     "est": 35,
+     "idea": "每个节点返回选它和不选它两种收益，按父子不能同时选合并。",
+     "pitfall": "不选父节点时，左右子树分别取各自两种状态的最大值。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/house-robber-iii/",
+     "urlEn": "https://leetcode.com/problems/house-robber-iii/"
+    },
+    {
+     "id": "1130",
+     "title": "Minimum Cost Tree From Leaf Values",
+     "cn": "叶值的最小代价生成树",
+     "slug": "minimum-cost-tree-from-leaf-values",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Dynamic Programming",
+      "Stack",
+      "Greedy",
+      "Monotonic Stack",
+      "Cartesian Tree"
+     ],
+     "tier": "optional",
+     "est": 40,
+     "idea": "区间 DP 枚举最后合并的分界点，加上两段叶子最大值的乘积。",
+     "pitfall": "内部节点值不参与叶子最大值统计；单叶子的内部节点代价为零。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/minimum-cost-tree-from-leaf-values/",
+     "urlEn": "https://leetcode.com/problems/minimum-cost-tree-from-leaf-values/"
+    },
+    {
+     "id": "486",
+     "title": "Predict the Winner",
+     "cn": "预测赢家",
+     "slug": "predict-the-winner",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Math",
+      "Dynamic Programming",
+      "Recursion",
+      "Minimax",
+      "Game Theory",
+      "Zero-Sum Game"
+     ],
+     "tier": "core",
+     "est": 35,
+     "idea": "状态表示当前行动方对另一方的最大分差，取一端后减去剩余区间的分差。",
+     "pitfall": "交换行动方后分差符号反转；平局算先手成功。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/predict-the-winner/",
+     "urlEn": "https://leetcode.com/problems/predict-the-winner/"
+    },
+    {
+     "id": "877",
+     "title": "Stone Game",
+     "cn": "石子游戏",
+     "slug": "stone-game",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Math",
+      "Dynamic Programming",
+      "Minimax",
+      "Game Theory",
+      "Zero-Sum Game"
+     ],
+     "tier": "optional",
+     "est": 30,
+     "idea": "先练习区间分差 DP，再尝试证明题目附加条件带来的先手策略。",
+     "pitfall": "条件改变后不能继续照搬恒定结论，要指出证明依赖的前提。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/stone-game/",
+     "urlEn": "https://leetcode.com/problems/stone-game/"
+    },
+    {
+     "id": "1140",
+     "title": "Stone Game II",
+     "cn": "石子游戏 II",
+     "slug": "stone-game-ii",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Math",
+      "Dynamic Programming",
+      "Minimax",
+      "Prefix Sum",
+      "Game Theory",
+      "Zero-Sum Game"
+     ],
+     "tier": "optional",
+     "est": 45,
+     "idea": "状态为当前位置和 M，用剩余总和减去对手在下一状态的最优所得。",
+     "pitfall": "取走 X 堆后 M 变成 max(M,X)，不可遗漏这一状态维度。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/stone-game-ii/",
+     "urlEn": "https://leetcode.com/problems/stone-game-ii/"
+    },
+    {
+     "id": "1406",
+     "title": "Stone Game III",
+     "cn": "石子游戏 III",
+     "slug": "stone-game-iii",
+     "difficulty": "Hard",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Math",
+      "Dynamic Programming",
+      "Minimax",
+      "Game Theory",
+      "Zero-Sum Game"
+     ],
+     "tier": "optional",
+     "est": 40,
+     "idea": "从后往前枚举取一到三项，以本轮得分减去对手的后缀分差。",
+     "pitfall": "石子价值可以为负，不能将所有状态默认设为零代表最优值。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/stone-game-iii/",
+     "urlEn": "https://leetcode.com/problems/stone-game-iii/"
+    },
+    {
+     "id": "1043",
+     "title": "Partition Array for Maximum Sum",
+     "cn": "分隔数组以得到最大和",
+     "slug": "partition-array-for-maximum-sum",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Dynamic Programming"
+     ],
+     "tier": "core",
+     "est": 35,
+     "idea": "枚举最后一段的长度，维护该段最大值并接上之前前缀的最优结果。",
+     "pitfall": "段长不超过 k；最大值随枚举范围扩展要及时更新。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/partition-array-for-maximum-sum/",
+     "urlEn": "https://leetcode.com/problems/partition-array-for-maximum-sum/"
+    },
+    {
+     "id": "1547",
+     "title": "Minimum Cost to Cut a Stick",
+     "cn": "切棍子的最小成本",
+     "slug": "minimum-cost-to-cut-a-stick",
+     "difficulty": "Hard",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Dynamic Programming",
+      "Sorting"
+     ],
+     "tier": "optional",
+     "est": 45,
+     "idea": "给切点排序并加入两端，枚举区间内第一次切割的位置。",
+     "pitfall": "本次成本是当前整段长度，不是两切点之间的局部间距。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/minimum-cost-to-cut-a-stick/",
+     "urlEn": "https://leetcode.com/problems/minimum-cost-to-cut-a-stick/"
+    }
+   ]
+  },
+  {
+   "week": 5,
+   "day": 36,
+   "title": "面试加练 · 贪心基础与局部最优性",
+   "focus": "每题必须补出口述证明：为何当前选择不损失最优解；不要只凭样例归纳。",
+   "drill": "尝试构造反例，并用交换论证或可达边界解释反例为何被排除。",
+   "problems": [
+    {
+     "id": "455",
+     "title": "Assign Cookies",
+     "cn": "分发饼干",
+     "slug": "assign-cookies",
+     "difficulty": "Easy",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Two Pointers",
+      "Greedy",
+      "Sorting",
+      "Quicksort"
+     ],
+     "tier": "optional",
+     "est": 20,
+     "idea": "排序后用能满足最小胃口的最小饼干，给后续保留更大资源。",
+     "pitfall": "饼干不足以满足当前孩子时只移动饼干指针。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/assign-cookies/",
+     "urlEn": "https://leetcode.com/problems/assign-cookies/"
+    },
+    {
+     "id": "860",
+     "title": "Lemonade Change",
+     "cn": "柠檬水找零",
+     "slug": "lemonade-change",
+     "difficulty": "Easy",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Greedy"
+     ],
+     "tier": "optional",
+     "est": 20,
+     "idea": "维护已有零钱，找十五元时优先使用十元加五元以保留五元。",
+     "pitfall": "不能使用尚未收到的零钱；二十元不能帮助后续找零。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/lemonade-change/",
+     "urlEn": "https://leetcode.com/problems/lemonade-change/"
+    },
+    {
+     "id": "55",
+     "title": "Jump Game",
+     "cn": "跳跃游戏",
+     "slug": "jump-game",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Dynamic Programming",
+      "Greedy"
+     ],
+     "tier": "core",
+     "est": 25,
+     "idea": "维护已可达位置能够扩展出的最远边界。",
+     "pitfall": "不可达位置的跳跃长度不能用来更新边界。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/jump-game/",
+     "urlEn": "https://leetcode.com/problems/jump-game/"
+    },
+    {
+     "id": "45",
+     "title": "Jump Game II",
+     "cn": "跳跃游戏 II",
+     "slug": "jump-game-ii",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Dynamic Programming",
+      "Greedy"
+     ],
+     "tier": "core",
+     "est": 30,
+     "idea": "把一次跳跃能覆盖的区间作为一层，扫描整层后推进到新的最远边界。",
+     "pitfall": "到达最后一个位置后不应再增加一次跳跃。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/jump-game-ii/",
+     "urlEn": "https://leetcode.com/problems/jump-game-ii/"
+    },
+    {
+     "id": "134",
+     "title": "Gas Station",
+     "cn": "加油站",
+     "slug": "gas-station",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Greedy"
+     ],
+     "tier": "core",
+     "est": 30,
+     "idea": "累计净油量，当前候选起点途中亏空时，整段起点都可排除。",
+     "pitfall": "还要检查全程净油量是否非负；局部重置不保证全程有解。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/gas-station/",
+     "urlEn": "https://leetcode.com/problems/gas-station/"
+    },
+    {
+     "id": "135",
+     "title": "Candy",
+     "cn": "分发糖果",
+     "slug": "candy",
+     "difficulty": "Hard",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Greedy"
+     ],
+     "tier": "core",
+     "est": 40,
+     "idea": "分别满足左侧和右侧相邻约束，每个位置取两侧要求的最大值。",
+     "pitfall": "相等评分没有大小约束；第二遍不能覆盖第一遍更大的需求。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/candy/",
+     "urlEn": "https://leetcode.com/problems/candy/"
+    },
+    {
+     "id": "376",
+     "title": "Wiggle Subsequence",
+     "cn": "摆动序列",
+     "slug": "wiggle-subsequence",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Dynamic Programming",
+      "Greedy"
+     ],
+     "tier": "core",
+     "est": 30,
+     "idea": "连续同方向变化只保留更极端的端点，把转折计入长度。",
+     "pitfall": "相等元素不形成摆动；起始方向为零时要单独理解计数。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/wiggle-subsequence/",
+     "urlEn": "https://leetcode.com/problems/wiggle-subsequence/"
+    },
+    {
+     "id": "1005",
+     "title": "Maximize Sum Of Array After K Negations",
+     "cn": "K 次取反后最大化的数组和",
+     "slug": "maximize-sum-of-array-after-k-negations",
+     "difficulty": "Easy",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Greedy",
+      "Sorting"
+     ],
+     "tier": "optional",
+     "est": 25,
+     "idea": "优先翻转绝对收益最大的负数，剩余奇数次翻转留给绝对值最小的数。",
+     "pitfall": "要求恰好 k 次；偶数次多余操作可以抵消，零也会影响奇数情况。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/maximize-sum-of-array-after-k-negations/",
+     "urlEn": "https://leetcode.com/problems/maximize-sum-of-array-after-k-negations/"
+    }
+   ]
+  },
+  {
+   "week": 5,
+   "day": 37,
+   "title": "面试加练 · 排序与交换论证",
+   "focus": "说明排序键和相等键的处理，再证明局部交换不会使结果更差。",
+   "drill": "比较看似合理的其他排序方式，并为错误规则构造反例。",
+   "problems": [
+    {
+     "id": "435",
+     "title": "Non-overlapping Intervals",
+     "cn": "无重叠区间",
+     "slug": "non-overlapping-intervals",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Dynamic Programming",
+      "Greedy",
+      "Sorting"
+     ],
+     "tier": "core",
+     "est": 30,
+     "idea": "按结束时间优先保留区间，为后续留下尽可能多空间。",
+     "pitfall": "端点相接允许共存；返回删除数量而非保留数量。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/non-overlapping-intervals/",
+     "urlEn": "https://leetcode.com/problems/non-overlapping-intervals/"
+    },
+    {
+     "id": "452",
+     "title": "Minimum Number of Arrows to Burst Balloons",
+     "cn": "用最少数量的箭引爆气球",
+     "slug": "minimum-number-of-arrows-to-burst-balloons",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Greedy",
+      "Sorting"
+     ],
+     "tier": "core",
+     "est": 30,
+     "idea": "按右端点排序，在最早结束区间的右端点放箭并覆盖所有包含该点的区间。",
+     "pitfall": "闭区间端点相等也能被同一支箭射中，比较条件与排除重叠题不同。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/minimum-number-of-arrows-to-burst-balloons/",
+     "urlEn": "https://leetcode.com/problems/minimum-number-of-arrows-to-burst-balloons/"
+    },
+    {
+     "id": "406",
+     "title": "Queue Reconstruction by Height",
+     "cn": "根据身高重建队列",
+     "slug": "queue-reconstruction-by-height",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Binary Indexed Tree",
+      "Segment Tree",
+      "Sorting"
+     ],
+     "tier": "core",
+     "est": 35,
+     "idea": "先处理高个子，同身高按 k 递增，将人插入当前队列的第 k 个位置。",
+     "pitfall": "同身高的排序方向不能反过来；后插入矮个子不会影响高个子的计数。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/queue-reconstruction-by-height/",
+     "urlEn": "https://leetcode.com/problems/queue-reconstruction-by-height/"
+    },
+    {
+     "id": "881",
+     "title": "Boats to Save People",
+     "cn": "救生艇",
+     "slug": "boats-to-save-people",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Two Pointers",
+      "Greedy",
+      "Sorting",
+      "Timsort"
+     ],
+     "tier": "core",
+     "est": 25,
+     "idea": "最重的人必占一条船，若能带上最轻的人就配对，否则独自乘船。",
+     "pitfall": "每船最多两人是证明前提，不能把规则推广为任意人数的装箱。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/boats-to-save-people/",
+     "urlEn": "https://leetcode.com/problems/boats-to-save-people/"
+    },
+    {
+     "id": "1029",
+     "title": "Two City Scheduling",
+     "cn": "两地调度",
+     "slug": "two-city-scheduling",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Greedy",
+      "Sorting",
+      "Hungarian Algorithm",
+      "Successive Shortest Path Algorithm"
+     ],
+     "tier": "core",
+     "est": 30,
+     "idea": "按去 A 相对去 B 的差价排序，选一半人去 A。",
+     "pitfall": "比较绝对费用而非差价会忽略人数限制下的机会成本。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/two-city-scheduling/",
+     "urlEn": "https://leetcode.com/problems/two-city-scheduling/"
+    },
+    {
+     "id": "646",
+     "title": "Maximum Length of Pair Chain",
+     "cn": "最长数对链",
+     "slug": "maximum-length-of-pair-chain",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Dynamic Programming",
+      "Greedy",
+      "Sorting",
+      "Longest Increasing Subsequence"
+     ],
+     "tier": "core",
+     "est": 30,
+     "idea": "按第二个数排序，选取能接上的最早结束数对；可与 DP 版本对照。",
+     "pitfall": "链的相邻边界必须严格小于，等于不能连接。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/maximum-length-of-pair-chain/",
+     "urlEn": "https://leetcode.com/problems/maximum-length-of-pair-chain/"
+    }
+   ]
+  },
+  {
+   "week": 5,
+   "day": 38,
+   "title": "面试加练 · 堆贪心与可撤销决策",
+   "focus": "在可行集合中选择局部最优，或用堆撤销代价最大的旧选择。",
+   "drill": "证明候选集合完整，解释堆顶的含义以及每次替换维持的不变量。",
+   "problems": [
+    {
+     "id": "502",
+     "title": "IPO",
+     "cn": "IPO",
+     "slug": "ipo",
+     "difficulty": "Hard",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Greedy",
+      "Sorting",
+      "Heap (Priority Queue)"
+     ],
+     "tier": "optional",
+     "est": 40,
+     "idea": "项目按门槛排序，把当前可做的项目加入收益大根堆，每轮取最大收益。",
+     "pitfall": "资本门槛不等于消费资本；最多做 k 个项目，不可行时需要停止。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/ipo/",
+     "urlEn": "https://leetcode.com/problems/ipo/"
+    },
+    {
+     "id": "630",
+     "title": "Course Schedule III",
+     "cn": "课程表 III",
+     "slug": "course-schedule-iii",
+     "difficulty": "Hard",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Greedy",
+      "Sorting",
+      "Heap (Priority Queue)"
+     ],
+     "tier": "optional",
+     "est": 45,
+     "idea": "按截止时间考虑课程，超时就撤销已选课程中耗时最长的一门。",
+     "pitfall": "只丢弃当前课程可能更差；堆中包含本轮刚加入的课程。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/course-schedule-iii/",
+     "urlEn": "https://leetcode.com/problems/course-schedule-iii/"
+    },
+    {
+     "id": "871",
+     "title": "Minimum Number of Refueling Stops",
+     "cn": "最低加油次数",
+     "slug": "minimum-number-of-refueling-stops",
+     "difficulty": "Hard",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Dynamic Programming",
+      "Greedy",
+      "Heap (Priority Queue)"
+     ],
+     "tier": "optional",
+     "est": 45,
+     "idea": "先把经过的站点油量放入大根堆，无法继续到达下一位置时回选最大油量。",
+     "pitfall": "只能使用已经可达的站点；到终点这一段也要执行可达性检查。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/minimum-number-of-refueling-stops/",
+     "urlEn": "https://leetcode.com/problems/minimum-number-of-refueling-stops/"
+    },
+    {
+     "id": "1353",
+     "title": "Maximum Number of Events That Can Be Attended",
+     "cn": "最多可以参加的会议数目",
+     "slug": "maximum-number-of-events-that-can-be-attended",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Greedy",
+      "Sorting",
+      "Heap (Priority Queue)"
+     ],
+     "tier": "core",
+     "est": 35,
+     "idea": "按日期推进，将已开始且未过期会议放入结束时间小根堆，优先参加最早结束者。",
+     "pitfall": "过期会议要先弹出；一天只能参加一个会议。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/maximum-number-of-events-that-can-be-attended/",
+     "urlEn": "https://leetcode.com/problems/maximum-number-of-events-that-can-be-attended/"
+    },
+    {
+     "id": "621",
+     "title": "Task Scheduler",
+     "cn": "任务调度器",
+     "slug": "task-scheduler",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Hash Table",
+      "Greedy",
+      "Sorting",
+      "Heap (Priority Queue)",
+      "Counting"
+     ],
+     "tier": "core",
+     "est": 35,
+     "idea": "从最高频任务的间隔槽推导下界，再与任务总数比较。",
+     "pitfall": "多个任务并列最高频时需要计算最后一组的宽度；冷却期为零也要成立。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/task-scheduler/",
+     "urlEn": "https://leetcode.com/problems/task-scheduler/"
+    },
+    {
+     "id": "1402",
+     "title": "Reducing Dishes",
+     "cn": "做菜顺序",
+     "slug": "reducing-dishes",
+     "difficulty": "Hard",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Dynamic Programming",
+      "Greedy",
+      "Sorting"
+     ],
+     "tier": "optional",
+     "est": 40,
+     "idea": "排序后从高满意度向低处扩展，新增一道前置菜的收益等于扩展后的后缀和。",
+     "pitfall": "负满意度不一定应直接丢弃，前置后可能让已有菜的总收益上升。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/reducing-dishes/",
+     "urlEn": "https://leetcode.com/problems/reducing-dishes/"
+    }
+   ]
+  },
+  {
+   "week": 5,
+   "day": 39,
+   "title": "面试加练 · 字符串贪心与不变量",
+   "focus": "维护尚未满足的需求、合法范围或被迫选择，区分有证明的贪心与猜测。",
+   "drill": "写下每轮结束后仍成立的不变量，再用重复元素和边界输入检验。",
+   "problems": [
+    {
+     "id": "763",
+     "title": "Partition Labels",
+     "cn": "划分字母区间",
+     "slug": "partition-labels",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Hash Table",
+      "Two Pointers",
+      "String",
+      "Greedy"
+     ],
+     "tier": "core",
+     "est": 25,
+     "idea": "预先记录每个字符最后位置，扫描时维护本段所有字符要求的最远端点。",
+     "pitfall": "端点会随着新字符不断扩展，未到端点不能提前分段。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/partition-labels/",
+     "urlEn": "https://leetcode.com/problems/partition-labels/"
+    },
+    {
+     "id": "678",
+     "title": "Valid Parenthesis String",
+     "cn": "有效的括号字符串",
+     "slug": "valid-parenthesis-string",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "String",
+      "Dynamic Programming",
+      "Stack",
+      "Greedy",
+      "Bracket Sequences"
+     ],
+     "tier": "core",
+     "est": 35,
+     "idea": "维护可能的未匹配左括号数量区间，星号分别扩展上下界。",
+     "pitfall": "下界不能小于零；上界为负表示当前前缀已经无解。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/valid-parenthesis-string/",
+     "urlEn": "https://leetcode.com/problems/valid-parenthesis-string/"
+    },
+    {
+     "id": "649",
+     "title": "Dota2 Senate",
+     "cn": "Dota2 参议院",
+     "slug": "dota2-senate",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "String",
+      "Greedy",
+      "Queue"
+     ],
+     "tier": "optional",
+     "est": 30,
+     "idea": "两队队列记录行动顺序，先行动者淘汰对方队首并把自己排到下一轮。",
+     "pitfall": "下一轮位置增加原始人数，不是当前存活人数。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/dota2-senate/",
+     "urlEn": "https://leetcode.com/problems/dota2-senate/"
+    },
+    {
+     "id": "738",
+     "title": "Monotone Increasing Digits",
+     "cn": "单调递增的数字",
+     "slug": "monotone-increasing-digits",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Math",
+      "Greedy"
+     ],
+     "tier": "core",
+     "est": 30,
+     "idea": "从右向左找到下降位置，将左侧数字减一并把需要重置的后缀置为九。",
+     "pitfall": "一次减一可能引发更左侧的新下降，需要继续向左检查。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/monotone-increasing-digits/",
+     "urlEn": "https://leetcode.com/problems/monotone-increasing-digits/"
+    },
+    {
+     "id": "846",
+     "title": "Hand of Straights",
+     "cn": "一手顺子",
+     "slug": "hand-of-straights",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Hash Table",
+      "Greedy",
+      "Sorting"
+     ],
+     "tier": "core",
+     "est": 35,
+     "idea": "当前最小的剩余牌只能作为新顺子的起点，依次消耗连续牌的计数。",
+     "pitfall": "总数可整除只是必要条件，中间缺牌也必须判失败。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/hand-of-straights/",
+     "urlEn": "https://leetcode.com/problems/hand-of-straights/"
+    },
+    {
+     "id": "659",
+     "title": "Split Array into Consecutive Subsequences",
+     "cn": "分割数组为连续子序列",
+     "slug": "split-array-into-consecutive-subsequences",
+     "difficulty": "Medium",
+     "paidOnly": false,
+     "tags": [
+      "Array",
+      "Hash Table",
+      "Greedy",
+      "Heap (Priority Queue)"
+     ],
+     "tier": "core",
+     "est": 40,
+     "idea": "优先接到等待当前数字的已有序列，否则用后续两个数字开启长度至少三的新序列。",
+     "pitfall": "先开新序列会让旧序列无法延长；原数组已排序是扫描策略的前提。",
+     "variants": [],
+     "url": "https://leetcode.cn/problems/split-array-into-consecutive-subsequences/",
+     "urlEn": "https://leetcode.com/problems/split-array-into-consecutive-subsequences/"
     }
    ]
   }

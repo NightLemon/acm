@@ -42,9 +42,9 @@ function normProblem(p, ctx) {
   };
 }
 
-// ---- algorithm days (weeks 1-3) ----
+// ---- algorithm days and interview practice ----
 const algoDays = [];
-for (const [file, week] of [['week1.json', 1], ['week2.json', 2], ['week3.json', 3]]) {
+for (const [file, week] of [['week1.json', 1], ['week2.json', 2], ['week3.json', 3], ['interview.json', 5]]) {
   const path = join(ROOT, 'data/raw', file);
   if (!existsSync(path)) { errors.push(`missing fragment: ${file}`); continue; }
   const frag = read(file);

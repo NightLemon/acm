@@ -674,6 +674,14 @@ ul.clean li::marker { color: var(--fg-dimmer); }
   border: 1px solid var(--border); border-radius: 6px;
   font: 13px/1.6 var(--sans); outline: none;
 }
+.custom-problem-form { display: grid; gap: 12px; padding: 14px 16px; }
+.custom-problem-form label { display: grid; gap: 6px; font-size: 12px; color: var(--fg-dim); }
+.custom-problem-form textarea, .custom-problem-form select {
+  width: 100%; box-sizing: border-box; background: var(--bg); color: var(--fg);
+  border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; font: inherit;
+}
+.custom-problem-form textarea { resize: vertical; min-height: 100px; }
+.custom-problem-form p { margin: 0; color: var(--fg-dimmer); font-size: 11px; line-height: 1.7; }
 .code-composer textarea:focus { border-color: var(--accent-dim); }
 .code-composer textarea::placeholder { color: var(--fg-dimmer); }
 .code-composer textarea:disabled { opacity: .65; }

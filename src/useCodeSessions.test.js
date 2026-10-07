@@ -82,4 +82,28 @@ describe('code description cache', () => {
     expect(cached['problem:library-a:0']).toBeUndefined();
     expect(cached['problem:library-a:84'].draft).toBe('draft-84');
   });
+
+  it('persists custom statements, both language frameworks and entry mode only for standalone workspaces', () => {
+    const storage = new MemoryStorage();
+    const session = {
+      localStatement: 'A private custom problem',
+      entryMode: 'function',
+      sources: { cpp: 'int main() {}', python: 'def solve(): pass' },
+      provider: { apiKey: 'must-not-persist' },
+      draft: '',
+      messages: [],
+    };
+    persistCodeDescriptionSession('standalone:library-a', session, storage);
+    expect(loadCodeDescriptionCache(storage)['standalone:library-a']).toMatchObject({
+      localStatement: session.localStatement,
+      entryMode: 'function',
+      sources: session.sources,
+    });
+    expect(storage.getItem(CODE_DESCRIPTIONS_KEY)).not.toContain('must-not-persist');
+    persistCodeDescriptionSession('problem:library-a:1', { ...session, draft: 'description' }, storage);
+    expect(loadCodeDescriptionCache(storage)['problem:library-a:1'].sources).toBeUndefined();
+    expect(loadCodeDescriptionCache(storage)['problem:library-a:1'].localStatement).toBeUndefined();
+    persistCodeDescriptionSession('standalone:library-a', { draft: '', messages: [] }, storage);
+    expect(loadCodeDescriptionCache(storage)['standalone:library-a']).toBeUndefined();
+  });
 });

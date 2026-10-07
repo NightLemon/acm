@@ -307,7 +307,7 @@ function LibraryWorkspace({ library, libraries, onManage }) {
           <div className="code-drawer-body">
             {!codeProblemId && (
               <form className="leetcode-link-loader" onSubmit={loadProblemLink}>
-                <label htmlFor="leetcode-problem-url">LeetCode 题目链接</label>
+                <label htmlFor="leetcode-problem-url">LeetCode 题目链接（自定义题目无需填写）</label>
                 <div>
                   <input
                     id="leetcode-problem-url"

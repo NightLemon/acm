@@ -72,10 +72,11 @@ export function CodeChatView({ problemMeta, embedded = false, libraryId }) {
   const templateAttemptsRef = useRef(new Set());
   const problemTemplates = problemMeta ? codeTemplates[String(problemMeta.id)] : null;
   const currentTemplate = problemTemplates?.[session.language] || '';
+  const entryMode = problemMeta ? 'class' : session.entryMode;
 
   const detection = useMemo(
-    () => detectTargetInterface(session.source, session.language),
-    [session.source, session.language]
+    () => detectTargetInterface(session.source, session.language, entryMode),
+    [session.source, session.language, entryMode]
   );
 
   useEffect(() => {
@@ -247,7 +248,7 @@ export function CodeChatView({ problemMeta, embedded = false, libraryId }) {
         session.language,
         detection
       )) {
-        throw new Error('生成结果修改或丢失了原目标接口，编辑器未修改。');
+        throw new Error('生成结果修改或丢失了原目标接口或入口框架，编辑器未修改。');
       }
       updateSession((current) => ({
         ...current,
@@ -283,7 +284,9 @@ export function CodeChatView({ problemMeta, embedded = false, libraryId }) {
   };
 
   const reset = () => {
-    if (!window.confirm('恢复当前题目的官方模板并清空对话？此操作无法撤销。')) return;
+    if (!window.confirm(problemMeta
+      ? '恢复当前题目的官方模板并清空对话？此操作无法撤销。'
+      : '清空自定义题面、所有语言的代码和对话？此操作无法撤销。')) return;
     abortRef.current?.abort();
     const language = session.language;
     const template = problemTemplates?.[language] || '';
@@ -331,6 +334,44 @@ export function CodeChatView({ problemMeta, embedded = false, libraryId }) {
         </>
       )}
 
+      {!problemMeta && (
+        <section className="code-panel">
+          <div className="code-panel-head">
+            <div>
+              <b>自定义题目 / 非 LeetCode</b>
+              <span>题面仅保存在本地，不发送给模型。代码框架、草稿与对话自动保存到当前浏览器。</span>
+            </div>
+          </div>
+          <div className="custom-problem-form">
+            <label>
+              <span>题面（仅供自己阅读）</span>
+              <textarea
+                aria-label="自定义题面"
+                value={session.localStatement}
+                onChange={(event) => updateSession({ localStatement: event.target.value })}
+                rows={5}
+                placeholder="粘贴题目、示例和约束；这里的内容不会自动发送给 LLM。"
+                disabled={!!busy}
+              />
+            </label>
+            <label>
+              <span>代码入口形式</span>
+              <select
+                aria-label="代码入口形式"
+                value={entryMode}
+                onChange={(event) => updateSession({ entryMode: event.target.value })}
+                disabled={!!busy}
+              >
+                <option value="class">类接口（Solution / 自定义类）</option>
+                <option value="function">普通函数 / main（标准输入输出）</option>
+              </select>
+            </label>
+            <p>在下方粘贴框架。函数模式识别全部顶层函数；Python 脚本请提供 def main / def solve 及调用入口。输入解析、输出格式和算法步骤也必须由你写出或描述，模型不会代补。</p>
+          </div>
+        </section>
+      )}
+      {storageError && <div className="code-error" role="alert">{storageError}</div>}
+
       <section className="code-panel editor-panel">
         <div className="code-panel-head">
           <div>
@@ -340,7 +381,7 @@ export function CodeChatView({ problemMeta, embedded = false, libraryId }) {
                 ? `已自动载入题目 ${problemMeta.id} 的官方 ${session.language === 'python' ? 'Python 3' : 'C++17'} 模板`
                 : problemMeta
                   ? <>此题未提供可用的官方 {session.language === 'python' ? 'Python 3' : 'C++17'} 模板，请切换语言或手动粘贴接口</>
-                  : <>粘贴包含输入输出定义的 <code>class Solution</code></>}
+                  : <>粘贴与你选择的入口形式一致的代码框架；不要在代码注释里粘贴题面</>}
             </span>
           </div>
           <div className="code-toolbar">
@@ -356,13 +397,14 @@ export function CodeChatView({ problemMeta, embedded = false, libraryId }) {
             <button className="fbtn" type="button" onClick={copyCode} disabled={!session.source.trim()}>
               {copied ? '✓ 已复制' : '复制代码'}
             </button>
-            <button className="fbtn" type="button" onClick={reset}>恢复官方模板</button>
+            <button className="fbtn" type="button" onClick={reset} disabled={!!busy}>{problemMeta ? '恢复官方模板' : '清空自定义工作区'}</button>
           </div>
         </div>
         <div className="code-editor-shell">
           <CodeEditor
             value={session.source}
             language={session.language}
+            entryMode={entryMode}
             height={HEIGHTS[heightKey]}
             onChange={changeSource}
             disabled={!!busy}
@@ -437,7 +479,7 @@ export function CodeChatView({ problemMeta, embedded = false, libraryId }) {
             </div>
             {provider.rememberKey && <div className="provider-warning">key 将写入 localStorage，同源脚本或 XSS 可能读取。仅在个人可信设备使用。</div>}
             <div className="provider-hint">默认 key 只保留在当前标签页。浏览器直连要求 Provider 允许 CORS；本项目不提供后端代理。</div>
-            {(providerError || storageError) && <div className="code-error">{providerError || storageError}</div>}
+            {providerError && <div className="code-error">{providerError}</div>}
           </div>
         )}
       </section>
@@ -473,7 +515,7 @@ export function CodeChatView({ problemMeta, embedded = false, libraryId }) {
           <div className="composer-actions">
             <span>{detection.ok
               ? `已识别${detection.kind === 'design-class' ? `${detection.mappings.length - 1} 个 public 方法` : '目标函数'}，发送时自动脱敏`
-              : '发送前会自动检查类接口'}</span>
+              : '发送前会自动检查代码接口'}</span>
             {busy
               ? <button className="code-send cancel" type="button" onClick={cancel}>取消</button>
               : <button className="code-send" type="submit" disabled={!session.draft.trim()}>校验并生成</button>}

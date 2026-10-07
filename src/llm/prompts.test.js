@@ -4,6 +4,8 @@ import {
   buildValidationMessages,
   parseGeneratedResponse,
   parseValidationResponse,
+  GENERATOR_SYSTEM_PROMPT,
+  VALIDATOR_SYSTEM_PROMPT,
 } from './prompts.js';
 
 const request = {
@@ -19,6 +21,8 @@ const request = {
   title: 'Secret Problem',
   url: 'https://example.test/problem',
   tags: ['dp'],
+  localStatement: 'Private problem statement, examples and constraints',
+  sources: { cpp: 'unmasked private framework' },
 };
 
 describe('prompt request allowlist', () => {
@@ -28,6 +32,8 @@ describe('prompt request allowlist', () => {
     expect(serialized).not.toContain('1234');
     expect(serialized).not.toContain('Secret Problem');
     expect(serialized).not.toContain('example.test');
+    expect(serialized).not.toContain('Private problem statement');
+    expect(serialized).not.toContain('unmasked private framework');
     expect(serialized).not.toContain('secretMethod');
     expect(serialized).not.toContain('不应再次发送的旧代码');
     expect(serialized).toContain('__TARGET_FUNCTION__');
@@ -61,6 +67,16 @@ describe('prompt request allowlist', () => {
 });
 
 describe('strict response parsing', () => {
+  it('约束模型只校验可翻译性，不纠错、不推导 IO、不添加入口', () => {
+    for (const prompt of [VALIDATOR_SYSTEM_PROMPT, GENERATOR_SYSTEM_PROMPT]) {
+      expect(prompt).toContain('not algorithmic correctness');
+      expect(prompt).toContain('incorrect algorithm must be translated as given');
+      expect(prompt).toContain('input parsing');
+      expect(prompt).toContain('otherwise ask neutral questions');
+    }
+    expect(GENERATOR_SYSTEM_PROMPT).toContain('edit only the bodies');
+    expect(GENERATOR_SYSTEM_PROMPT).toContain('do not add an entry point');
+  });
   it('接受 ready 与澄清结果', () => {
     expect(parseValidationResponse('{"status":"ready","questions":[]}')).toEqual({ status: 'ready', questions: [] });
     expect(parseValidationResponse('{"status":"needs_clarification","questions":["边界是什么？"]}')).toEqual({

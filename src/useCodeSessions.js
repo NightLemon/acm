@@ -70,14 +70,24 @@ export function persistCodeDescriptionSession(sessionKey, session, storage = loc
   const sessions = loadCodeDescriptionCache(storage);
   const draft = typeof session?.draft === 'string' ? session.draft : '';
   const messages = normalizeMessages(session?.messages);
+  const custom = sessionKey.startsWith('standalone:') ? {
+    localStatement: typeof session?.localStatement === 'string' ? session.localStatement : '',
+    entryMode: session?.entryMode === 'function' ? 'function' : 'class',
+    sources: {
+      cpp: typeof session?.sources?.cpp === 'string' ? session.sources.cpp : '',
+      python: typeof session?.sources?.python === 'string' ? session.sources.python : '',
+    },
+  } : null;
 
-  if (!draft && messages.length === 0) {
+  if (!draft && messages.length === 0 && !custom?.localStatement
+    && !custom?.sources.cpp && !custom?.sources.python && custom?.entryMode !== 'function') {
     delete sessions[sessionKey];
   } else {
     sessions[sessionKey] = {
       language: session?.language === 'python' ? 'python' : 'cpp',
       draft,
       messages,
+      ...custom,
       updatedAt: Number.isFinite(session?.updatedAt) ? session.updatedAt : Date.now(),
     };
   }
@@ -108,6 +118,8 @@ export function emptyCodeSession() {
     sources: { cpp: '', python: '' },
     targetName: '',
     confirmedSignature: '',
+    localStatement: '',
+    entryMode: 'class',
     draft: '',
     messages: [],
     updatedAt: Date.now(),
@@ -128,6 +140,8 @@ function normalizeSession(value) {
     language,
     source: sources[language],
     sources,
+    localStatement: typeof value.localStatement === 'string' ? value.localStatement : '',
+    entryMode: value.entryMode === 'function' ? 'function' : 'class',
     draft: typeof value.draft === 'string' ? value.draft : '',
     messages: normalizeMessages(value.messages),
     updatedAt: Number.isFinite(value.updatedAt) ? value.updatedAt : Date.now(),

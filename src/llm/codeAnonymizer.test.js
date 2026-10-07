@@ -129,4 +129,87 @@ public:
       '    def _unlink(self, node):\n        pass\n\n    def get(self, key: int) -> int:'
     ), 'python', result)).toBe(true);
   });
+
+  it('支持 C++ 普通函数、多行签名与 main，并保留框架', () => {
+    const source = `#include <iostream>
+using namespace std;
+int compute(
+    int value
+) { return 0; }
+int main() {
+    int value;
+    cin >> value;
+    cout << compute(value) << '\\n';
+}`;
+    const result = detectTargetInterface(source, 'cpp', 'function');
+    expect(result.ok).toBe(true);
+    expect(result.kind).toBe('free-functions');
+    expect(result.mappings.map((item) => item.name)).toEqual(['compute', 'main']);
+    expect(result.maskedSource).not.toMatch(/\bcompute\b|\bmain\b/);
+    expect(restoreTargetInterface(result.maskedSource, result.mappings)).toBe(source);
+    expect(isTargetInterfaceUnchanged(source.replace('return 0;', 'return value * 2;'), 'cpp', result)).toBe(true);
+    expect(isTargetInterfaceUnchanged(source.replace('int value\n)', 'long value\n)'), 'cpp', result)).toBe(false);
+    expect(isTargetInterfaceUnchanged(source.replace('#include <iostream>', ''), 'cpp', result)).toBe(false);
+    expect(isTargetInterfaceUnchanged(source.slice(0, source.indexOf('int main')), 'cpp', result)).toBe(false);
+  });
+
+  it('支持 Python 普通函数和标准输入输出入口，保护调用框架', () => {
+    const source = `import sys
+def solve(value: int) -> int:
+    pass
+
+def main():
+    value = int(sys.stdin.readline())
+    print(solve(value))
+
+if __name__ == "__main__":
+    main()
+`;
+    const result = detectTargetInterface(source, 'python', 'function');
+    expect(result.ok).toBe(true);
+    expect(result.mappings.map((item) => item.name)).toEqual(['solve', 'main']);
+    expect(result.maskedSource).toContain('if __name__ == "__main__":');
+    expect(restoreTargetInterface(result.maskedSource, result.mappings)).toBe(source);
+    expect(isTargetInterfaceUnchanged(source.replace('pass', 'return value + 1'), 'python', result)).toBe(true);
+    expect(isTargetInterfaceUnchanged(source.replace('value: int', 'value: str'), 'python', result)).toBe(false);
+    expect(isTargetInterfaceUnchanged(source.slice(0, source.indexOf('if __name__')), 'python', result)).toBe(false);
+    expect(isTargetInterfaceUnchanged(source.replace('    main()\n', '    solve(0)\n'), 'python', result)).toBe(false);
+    expect(isTargetInterfaceUnchanged(source.replace('    main()\n', 'main()\n'), 'python', result)).toBe(false);
+  });
+
+  it('忽略注释、字符串、类方法和嵌套函数中的伪入口', () => {
+    const python = `"""
+def fake():
+    pass
+"""
+class Helper:
+    def method(self): pass
+def solve(
+    value: int,
+) -> int:
+    def nested(): return 1
+    return value
+`;
+    const result = detectTargetInterface(python, 'python', 'function');
+    expect(result.mappings.map((item) => item.name)).toEqual(['solve']);
+    expect(isTargetInterfaceUnchanged(python.replace('return value', 'return nested()'), 'python', result)).toBe(true);
+    const cpp = '// int fake() {} \nclass Helper { public: int method() { return 0; } };\nint solve(int x) { return x; }';
+    expect(detectTargetInterface(cpp, 'cpp', 'function').mappings.map((item) => item.name)).toEqual(['solve']);
+  });
+
+  it('识别 Python 单行函数、字符串默认值和 CRLF', () => {
+    const source = 'def solve(value: str = ":") -> str: return value\r\n\r\nprint(solve())\r\n';
+    const result = detectTargetInterface(source, 'python', 'function');
+    expect(result.ok).toBe(true);
+    expect(isTargetInterfaceUnchanged(source.replace('return value', 'return value * 2'), 'python', result)).toBe(true);
+    expect(isTargetInterfaceUnchanged(source.replace('= ":"', '= "?"'), 'python', result)).toBe(false);
+    expect(detectTargetInterface('class Solution:\n    def solve(self, x): return x', 'python').ok).toBe(true);
+  });
+
+  it('拒绝没有命名函数的脚本及不完整的 C++ 框架', () => {
+    expect(detectTargetInterface('print(input())', 'python', 'function').ok).toBe(false);
+    expect(detectTargetInterface('int main() {', 'cpp', 'function').ok).toBe(false);
+    expect(detectTargetInterface('', 'cpp', 'function').ok).toBe(false);
+    expect(detectTargetInterface('int main() {}', 'cpp').ok).toBe(false);
+  });
 });
